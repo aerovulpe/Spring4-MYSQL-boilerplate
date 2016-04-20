@@ -1,8 +1,5 @@
 package com.namespace.init;
 
-import org.pac4j.core.authorization.Authorizer;
-import org.pac4j.core.authorization.RequireAnyRoleAuthorizer;
-import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
 import org.pac4j.springframework.web.RequiresAuthenticationInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +17,6 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -46,11 +41,7 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     @Resource
     private Environment environment;
     @Autowired
-    private Authorizer adminRoleAuthorizer;
-    @Autowired
-    private Clients clients;
-    @Autowired
-    private Config config;
+    private Config pac4JConfig;
 
     @Override
     public void addResourceHandlers(final ResourceHandlerRegistry registry) {
@@ -60,38 +51,24 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new LocaleChangeInterceptor());
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(config, "oidClient"))
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "oidClient"))
                 .addPathPatterns("login/oid");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(config, "facebookClient"))
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "facebookClient"))
                 .addPathPatterns("login/facebook");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(config, "twitterClient"))
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "twitterClient"))
                 .addPathPatterns("login/twitter");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(config, "formClient"))
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "formClient"))
                 .addPathPatterns("login/form");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(config, "indirectBasicAuthClient"))
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "indirectBasicAuthClient"))
                 .addPathPatterns("login/iba");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(config, "casClient"))
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "casClient"))
                 .addPathPatterns("login/cas");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(config, "parameterClient"))
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "parameterClient"))
                 .addPathPatterns("login/par");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(config, "directBasicAuthClient"))
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "directBasicAuthClient"))
                 .addPathPatterns("login/dba");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(config, "casRestBasicClient"))
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "casRestBasicClient"))
                 .addPathPatterns("login/crb");
-    }
-
-
-
-    @Bean
-    public RequireAnyRoleAuthorizer adminRoleAuthorizer() {
-        return new RequireAnyRoleAuthorizer<>("ROLE_ADMIN");
-    }
-
-    @Bean
-    public Config config() {
-        Map<String, Authorizer> authorizers = new HashMap<>();
-        authorizers.put("admin", adminRoleAuthorizer);
-        return new Config(clients, authorizers);
     }
 
     @Bean
