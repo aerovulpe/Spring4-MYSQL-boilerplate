@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name="com.namespace.model.Account" table="accounts">
+        <meta attribute="class-description">
+            This class represents a user account.
+        </meta>
+        <id name="username" column="username" type="string">
+            <generator class="native"/>
+        </id>
+        <property name="password" column="password" type="string"/>
+        <property name="firstName" column="firstName" type="string"/>
+        <property name="lastName" column="lastName" type="string"/>
+        <property name="email" column="email" type="string"/>
+        <property name="admin" column="admin" type="boolean"/>
+        <property name="enabled" column="enabled" type="boolean" />
+        <property name="bannedUser" column="bannedUser" type="boolean" />
+        <property name="accountNonExpired" column="accountNonExpired" />
+    </class>
+</hibernate-mapping>
