@@ -8,7 +8,7 @@
             <c:if test="${profile == null}">
                 <p>
                     <a href="/login" class="btn btn-primary btn-large">Sign in &raquo;</a>
-                    <a href="/createDefaultUsers" class="btn btn-large btn-success"> Create System Users </a>
+                    <a href="/accounts/createDefaultUsers" class="btn btn-large btn-success"> Create System Users </a>
                 </p>
 
             </c:if>

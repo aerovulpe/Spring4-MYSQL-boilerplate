@@ -66,11 +66,13 @@ public class AccountController extends BaseController {
         return accountManager.createNewAccount(model, result) != null ? "redirect:./" : "account/new";
     }
 
-    @RequestMapping(value = "/accounts/createdDefault", method = GET)
+    @RequestMapping(value = "/accounts/createDefaultUsers", method = GET)
     public String createDefaultAccount() throws Exception{
-        Account defaultAccount = new Account("Default", "User", "default@localhost", true, true, "admin", "root");
-        accountManager.createNewAccount(defaultAccount);
-        return "redirect:./";
+        Account defaultAdmin = new Account("John", "Doe", "john@localhost", true, true, "admin", "adminPass");
+        Account defaultUser = new Account("Jane", "Doe", "jane@localhost", false, true, "user", "userPass");
+        accountManager.createNewAccount(defaultAdmin);
+        accountManager.createNewAccount(defaultUser);
+        return "redirect:/";
     }
 
     @RequestMapping(value = "/accounts/{username}/", method = PUT, params = "details")

@@ -1,5 +1,6 @@
 package com.namespace.init;
 
+import com.namespace.service.security.BCryptUsernamePasswordAuthenticator;
 import org.pac4j.cas.client.CasClient;
 import org.pac4j.cas.client.rest.CasRestBasicAuthClient;
 import org.pac4j.cas.credentials.authenticator.CasRestAuthenticator;
@@ -11,12 +12,11 @@ import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.direct.ParameterClient;
 import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
-import org.pac4j.http.credentials.authenticator.UsernamePasswordAuthenticator;
-import org.pac4j.http.credentials.authenticator.test.SimpleTestUsernamePasswordAuthenticator;
 import org.pac4j.jwt.credentials.authenticator.JwtAuthenticator;
 import org.pac4j.oauth.client.FacebookClient;
 import org.pac4j.oauth.client.TwitterClient;
 import org.pac4j.oidc.client.OidcClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 
 import java.util.HashMap;
@@ -37,8 +37,11 @@ public class Pac4JConfig {
 
     private static final short PORT_NUMBER = 8080;
 
+    @Autowired
+    BCryptUsernamePasswordAuthenticator passwordAuthenticator;
+
     @Bean
-    public Config config() {
+    public Config pac4JConfig() {
         Map<String, Authorizer> authorizers = new HashMap<>();
         authorizers.put("admin", new RequireAnyRoleAuthorizer<>("ROLE_ADMIN"));
 
@@ -59,8 +62,6 @@ public class Pac4JConfig {
         twitterClient.setKey(TWITTER_KEY);
         twitterClient.setSecret(TWITTER_SECRET);
 
-        UsernamePasswordAuthenticator passwordAuthenticator = new SimpleTestUsernamePasswordAuthenticator();
-
         CasClient casClient = new CasClient();
         casClient.setCasLoginUrl("https://casserverpac4j.herokuapp.com/login");
 
@@ -71,7 +72,7 @@ public class Pac4JConfig {
 
         return new Config(new Clients("http://localhost:" + PORT_NUMBER + "/callback",
                 oidcClient, facebookClient, twitterClient,
-                new FormClient("http://localhost:"+ PORT_NUMBER + "/loginForm", passwordAuthenticator),
+                new FormClient("http://localhost:" + PORT_NUMBER + "/loginForm", passwordAuthenticator),
                 new IndirectBasicAuthClient(passwordAuthenticator), parameterClient,
                 new DirectBasicAuthClient(passwordAuthenticator),
                 new CasRestBasicAuthClient(new CasRestAuthenticator("https://casserverpac4j.herokuapp.com/"),

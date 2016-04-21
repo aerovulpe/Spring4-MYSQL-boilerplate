@@ -51,24 +51,26 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new LocaleChangeInterceptor());
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "oidClient"))
-                .addPathPatterns("login/oid");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "facebookClient"))
-                .addPathPatterns("login/facebook");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "twitterClient"))
-                .addPathPatterns("login/twitter");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "formClient"))
-                .addPathPatterns("login/form");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "indirectBasicAuthClient"))
-                .addPathPatterns("login/iba");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "casClient"))
-                .addPathPatterns("login/cas");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "parameterClient"))
-                .addPathPatterns("login/par");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "directBasicAuthClient"))
-                .addPathPatterns("login/dba");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "casRestBasicClient"))
-                .addPathPatterns("login/crb");
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "OidcClient"))
+                .addPathPatterns("/login/oidc");
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "FacebookClient"))
+                .addPathPatterns("/login/facebook");
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "TwitterClient"))
+                .addPathPatterns("/login/twitter");
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "FormClient"))
+                .addPathPatterns("/login/form");
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "IndirectBasicAuthClient"))
+                .addPathPatterns("/login/iba");
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "CasClient"))
+                .addPathPatterns("/login/cas");
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "ParameterClient"))
+                .addPathPatterns("/login/par");
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "DirectBasicAuthClient"))
+                .addPathPatterns("/login/dba");
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "CasRestBasicClient"))
+                .addPathPatterns("/login/crb");
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "FacebookClient", "admin"))
+                .addPathPatterns("/login/admin/facebook");
     }
 
     @Bean

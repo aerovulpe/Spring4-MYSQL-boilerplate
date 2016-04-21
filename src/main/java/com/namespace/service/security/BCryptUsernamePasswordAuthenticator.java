@@ -1,0 +1,78 @@
+package com.namespace.service.security;
+
+import com.namespace.model.Account;
+import com.namespace.service.AccountManager;
+import org.pac4j.core.exception.CredentialsException;
+import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.core.util.CommonHelper;
+import org.pac4j.http.credentials.UsernamePasswordCredentials;
+import org.pac4j.http.credentials.authenticator.UsernamePasswordAuthenticator;
+import org.pac4j.http.credentials.authenticator.test.SimpleTestUsernamePasswordAuthenticator;
+import org.pac4j.http.profile.HttpProfile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Component;
+
+/**
+ * Created by Aaron on 20/04/2016.
+ */
+@Component
+public class BCryptUsernamePasswordAuthenticator implements UsernamePasswordAuthenticator {
+    private static final Logger logger = LoggerFactory.getLogger(SimpleTestUsernamePasswordAuthenticator.class);
+
+    @Autowired
+    private AccountManager accountManager;
+
+    public BCryptUsernamePasswordAuthenticator() {
+    }
+
+    @Override
+    public void validate(UsernamePasswordCredentials credentials) {
+        if (credentials == null) {
+            throwsException("No credential");
+        }
+        String username = credentials.getUsername();
+        String password = credentials.getPassword();
+        logger.info("Username: " + username + ". Password:" + password);
+        if (CommonHelper.isBlank(username)) {
+            throwsException("Username cannot be blank");
+        }
+        if (CommonHelper.isBlank(password)) {
+            throwsException("Password cannot be blank");
+        }
+
+        Account account = accountManager.getAccountByUsername(username);
+        if (account == null) {
+            throwsException("Account not found");
+        }
+
+        logger.info("Account: " + account.toString());
+
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        if (!passwordEncoder.matches(password, account.getPassword())) {
+            throwsException("Username : '" + username + "' does not match password");
+        }
+
+        final HttpProfile profile = new HttpProfile();
+        profile.setId(username);
+        profile.addAttribute(CommonProfile.USERNAME, username);
+        profile.addAttribute("email", account.getEmail());
+        profile.addAttribute("first_name", account.getFirstName());
+        profile.addAttribute("family_name", account.getLastName());
+        profile.addAttribute("name", account.getFirstName() + " " + account.getLastName());
+        profile.addAttribute("display_name", account.getFirstName());
+
+        profile.addRole("ROLE_USER");
+        if (account.isAdmin()) {
+            profile.addRole("ROLE_ADMIN");
+        }
+
+        credentials.setUserProfile(profile);
+    }
+
+    private void throwsException(final String message) {
+        throw new CredentialsException(message);
+    }
+}

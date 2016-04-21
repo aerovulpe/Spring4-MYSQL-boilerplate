@@ -3,9 +3,11 @@ package com.namespace.dao;
 import com.namespace.model.Account;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.pac4j.core.util.CommonHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -58,7 +60,8 @@ public class AccountDAOImpl implements AccountDAO {
 
         } catch (Exception e) {
             logger.info("cannot retrieve the " + username + "'s account from the database. Should be for two reasons: " +
-                    "The account associated with this user doesn't exist, of there are not any accounts in the database");
+                    "The account associated with this user doesn't exist, of there are not any accounts in the database" +
+                    e.toString());
             return null;
         }
     }
@@ -66,6 +69,8 @@ public class AccountDAOImpl implements AccountDAO {
 
     @Override
     public void create(Account account) {
+        if (account.getPassword() != null)
+            account.setPassword(getHashPassword(account.getPassword()));
         getCurrentSession().save(account);
     }
 
@@ -80,13 +85,14 @@ public class AccountDAOImpl implements AccountDAO {
                 "in the database: " + account.toString());
 
         Account accountToUpdate = getAccount(account.getUsername());
-        if(accountToUpdate == null){
+        if (accountToUpdate == null) {
             logger.info("This account doesn't exist at the database or " +
                     "something was wrong.");
             return false;
         }
 
-        accountToUpdate.setPassword(account.getPassword());
+        if (CommonHelper.areNotEquals(account.getPassword(), accountToUpdate.getPassword()))
+            accountToUpdate.setPassword(getHashPassword(account.getPassword()));
         accountToUpdate.setFirstName(account.getFirstName());
         accountToUpdate.setLastName(account.getLastName());
         accountToUpdate.setEmail(account.getEmail());
@@ -103,7 +109,7 @@ public class AccountDAOImpl implements AccountDAO {
     @Override
     public boolean remove(Account account) {
         Account accountToDelete = getAccount(account.getUsername());
-        if(accountToDelete == null){
+        if (accountToDelete == null) {
             logger.info("This account doesn't exist at the database or " +
                     "something was wrong.");
             return false;
@@ -116,5 +122,10 @@ public class AccountDAOImpl implements AccountDAO {
 
     private Session getCurrentSession() {
         return sessionFactory.getCurrentSession();
+    }
+
+    private String getHashPassword(String password) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        return passwordEncoder.encode(password);
     }
 }

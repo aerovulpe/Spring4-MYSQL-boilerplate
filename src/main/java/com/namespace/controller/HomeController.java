@@ -1,12 +1,9 @@
 package com.namespace.controller;
 
-import org.pac4j.core.config.Config;
 import org.pac4j.core.profile.UserProfile;
-import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.jwt.profile.JwtGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,29 +23,22 @@ public class HomeController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
-    @Autowired
-    private Config config;
-
     public HomeController() {
     }
 
     @RequestMapping(value = "/", method = GET)
     public String home(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
         UserProfile profile = getProfile(request, response);
-        if(profile == null)
-            return "redirect:/login";
-
-        logger.info("Welcome home, " + profile.getAttribute("first_name") + "!");
+        if (profile != null)
+            logger.info("Welcome home, " + profile.getAttribute("name") + "!");
         map.put("profile", profile);
         return "/home/home";
     }
 
-    @RequestMapping(value = "/login", method = POST)
-    public String login(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
-        UserProfile profile = getProfile(request, response);
-        logger.info("Profile: " + profile);
-        map.put("profile", profile);
-        return "/home/home";
+    @RequestMapping(value = "/loginfailed", method = GET)
+    public String loginError(ModelMap model) {
+        model.addAttribute("error", "true");
+        return "/login/login";
     }
 
     @RequestMapping(value = "/login", method = GET)
@@ -56,44 +46,44 @@ public class HomeController extends BaseController {
         return "/signin/signin";
     }
 
-    @RequestMapping(value = "/loginfailed", method = GET)
-    public String loginError(ModelMap model) {
-        model.addAttribute("error", "true");
-        return "login/login";
-    }
-
-    @RequestMapping(value = "/logout", method = GET)
-    public String logout() {
-        return "/home/home";
-    }
-
-    @RequestMapping("/login/facebook/")
+    @RequestMapping("/login/facebook")
     public String facebook(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
-        return protectedIndex(request, response, map);
+        map.put("profile", getProfile(request, response));
+        return "redirect:/";
     }
 
-    @RequestMapping("/login/twitter/")
+    @RequestMapping("/login/admin/facebook")
+    public String adminFacebook(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
+        map.put("profile", getProfile(request, response));
+        return "redirect:/";
+    }
+
+    @RequestMapping("/login/twitter")
     public String twitter(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
-        return protectedIndex(request, response, map);
+        map.put("profile", getProfile(request, response));
+        return "redirect:/";
     }
 
-    @RequestMapping("/login/form/")
+    @RequestMapping("/login/iba")
     public String form(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
-        return protectedIndex(request, response, map);
+        map.put("profile", getProfile(request, response));
+        return "redirect:/";
     }
 
-    @RequestMapping("/login/oidc/")
+    @RequestMapping("/login/oidc")
     public String oidc(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
-        return protectedIndex(request, response, map);
+        map.put("profile", getProfile(request, response));
+        return "redirect:/";
     }
 
 
-    @RequestMapping(value = "/jwt/", method = POST)
+    @RequestMapping(value = "/jwt", method = POST)
     public String restJwt(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
-        return protectedIndex(request, response, map);
+        map.put("profile", getProfile(request, response));
+        return "redirect:/";
     }
 
-    @RequestMapping(value = "/jwt/", method = GET)
+    @RequestMapping(value = "/jwt", method = GET)
     public String jwt(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
         final UserProfile profile = getProfile(request, response);
         final JwtGenerator<UserProfile> generator = new JwtGenerator<>("12345678901234567890123456789012");
@@ -103,18 +93,6 @@ public class HomeController extends BaseController {
         }
         map.put("token", token);
         return "jwt";
-    }
-
-    @RequestMapping("/loginForm")
-    public String theForm(Map<String, Object> map) {
-        final FormClient formClient = (FormClient) config.getClients().findClient("FormClient");
-        map.put("callbackUrl", formClient.getCallbackUrl());
-        return "signin/loginForm";
-    }
-
-    private String protectedIndex(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
-        map.put("profile", getProfile(request, response));
-        return "home/home";
     }
 }
 
