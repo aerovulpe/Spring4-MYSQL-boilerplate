@@ -31,7 +31,7 @@ public class AccountDAOImpl implements AccountDAO {
     @SuppressWarnings("unchecked")
     public List<Account> findEnabled() {
         List<Account> accounts = getCurrentSession()
-                .createQuery("from com.namespace.model.Account as Account where Account.enabled = TRUE").list();
+                .createQuery("from Account as user where 'ENABLED' in elements(user.permissions)").list();
 
         logger.info("retrieving the accounts from the database: " + accounts.toString());
 
@@ -42,7 +42,7 @@ public class AccountDAOImpl implements AccountDAO {
     @SuppressWarnings("unchecked")
     public List<Account> findDisabled() {
         List<Account> accounts = getCurrentSession()
-                .createQuery("from com.namespace.model.Account as Account where Account.enabled = FALSE").list();
+                .createQuery("from Account as user where 'ENABLED' not in elements(user.permissions)").list();
 
         logger.info("retrieving the accounts from the database: " + accounts.toString());
 
@@ -60,8 +60,7 @@ public class AccountDAOImpl implements AccountDAO {
 
         } catch (Exception e) {
             logger.info("cannot retrieve the " + username + "'s account from the database. Should be for two reasons: " +
-                    "The account associated with this user doesn't exist, of there are not any accounts in the database" +
-                    e.toString());
+                    "The account associated with this user doesn't exist, of there are not any accounts in the database");
             return null;
         }
     }
@@ -96,10 +95,12 @@ public class AccountDAOImpl implements AccountDAO {
         accountToUpdate.setFirstName(account.getFirstName());
         accountToUpdate.setLastName(account.getLastName());
         accountToUpdate.setEmail(account.getEmail());
-        accountToUpdate.setAdmin(account.isAdmin());
-        accountToUpdate.setEnabled(account.isEnabled());
-        accountToUpdate.setBannedUser(account.isBannedUser());
-        accountToUpdate.setAccountNonExpired(account.isAccountNonExpired());
+        accountToUpdate.setGender(account.getGender());
+        accountToUpdate.setLocale(account.getLocale());
+        accountToUpdate.setPictureUrl(account.getPictureUrl());
+        accountToUpdate.setLocation(account.getLocation());
+        accountToUpdate.setRoles(account.getRoles());
+        accountToUpdate.setPermissions(account.getPermissions());
 
         logger.info("Confirmed: this account already exist.");
         getCurrentSession().update(accountToUpdate);

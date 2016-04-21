@@ -1,16 +1,18 @@
 package com.namespace.model;
 
+import org.pac4j.core.profile.Gender;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 @Entity
-@Table(name="accounts")
+@Table(name = "accounts")
 public class Account {
-    private static final String ROLE_USER = "ROLE_USER";
-    private static final String ROLE_ADMIN = "ROLE_ADMIN";
+    public static final String ROLE_USER = "ROLE_USER";
+    public static final String ROLE_ADMIN = "ROLE_ADMIN";
+
+    public static final String PERMISSION_ENABLED = "ENABLED";
 
     @Id
     @Column(name = "username", unique = true, nullable = false)
@@ -19,11 +21,29 @@ public class Account {
 
     private String firstName;
     private String lastName;
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
-    private boolean admin;
-    private boolean enabled;
-    private boolean bannedUser;
-    private boolean accountNonExpired;
+    private Gender gender;
+    private String locale;
+    private String pictureUrl;
+    private String location;
+    private boolean isRemembered;
+
+    @ElementCollection
+    @CollectionTable(
+            name = "roles",
+            joinColumns = @JoinColumn(name = "username")
+    )
+    @Column(name="role")
+    private Set<String> roles;
+
+    @ElementCollection
+    @CollectionTable(
+            name = "permissions",
+            joinColumns = @JoinColumn(name = "username")
+    )
+    @Column(name="permission")
+    private Set<String> permissions;
 
     public String getFirstName() {
         return firstName;
@@ -57,10 +77,6 @@ public class Account {
         this.username = username;
     }
 
-    public void setAccountNonExpired(boolean accountNonExpired) {
-        this.accountNonExpired = accountNonExpired;
-    }
-
     public String getPassword() {
         return password;
     }
@@ -69,61 +85,97 @@ public class Account {
         this.password = password;
     }
 
-    public boolean isAdmin() {
-        return admin;
+    @Enumerated(EnumType.STRING)
+    public Gender getGender() {
+        return gender;
     }
 
-    public void setAdmin(boolean admin) {
-        this.admin = admin;
+    public void setGender(Gender gender) {
+        this.gender = gender;
     }
 
-    public boolean isBannedUser() {
-        return bannedUser;
+    public String getLocale() {
+        return locale;
     }
 
-    public void setBannedUser(boolean bannedUser) {
-        this.bannedUser = bannedUser;
+    public void setLocale(String locale) {
+        this.locale = locale;
     }
 
-    public Collection<String> getAuthorities() {
-        List<String> authorityList = new ArrayList<>();
-        authorityList.add(ROLE_USER);
-        if (admin) {
-            authorityList.add(ROLE_ADMIN);
-        }
-        return authorityList;
+    public String getPictureUrl() {
+        return pictureUrl;
     }
 
-    public boolean isAccountNonExpired() {
-        return accountNonExpired;
+    public void setPictureUrl(String pictureUrl) {
+        this.pictureUrl = pictureUrl;
     }
 
-    public boolean isAccountNonLocked() {
-        return !bannedUser;
+    public String getLocation() {
+        return location;
     }
 
-    public boolean isEnabled() {
-        return enabled;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    public Set<String> getRoles() {
+        return roles;
     }
 
-    public Account(String firstName, String lastName, String email, boolean admin, boolean enabled, String username, String password) {
-        this(firstName, lastName, email, username, password);
-        this.admin = admin;
-        this.enabled = enabled;
+    public void setRoles(Set<String> roles) {
+        this.roles = roles;
     }
 
-    public Account(@NotNull String firstName, @NotNull String lastName,
-                   @NotNull String email, @NotNull String username, String password) {
+    public Set<String> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(Set<String> permissions) {
+        this.permissions = permissions;
+    }
+
+    public boolean isRemembered() {
+        return isRemembered;
+    }
+
+    public void setRemembered(boolean remembered) {
+        isRemembered = remembered;
+    }
+
+    public void addRole(String role) {
+        roles.add(role);
+    }
+
+    public void removeRole(String role) {
+        roles.remove(role);
+    }
+
+    public void addPermission(String permission) {
+        permissions.add(permission);
+    }
+
+    public void removePermission(String permission) {
+        permissions.remove(permission);
+    }
+
+    public boolean hasRole(String role){
+        return roles.contains(role);
+    }
+
+    public boolean hasPermission(String permission){
+        return permissions.contains(permission);
+    }
+
+    public Account(@NotNull String username, String password, @NotNull String firstName, @NotNull String lastName,
+                   @NotNull String email, @NotNull Set<String> roles,
+                   @NotNull Set<String> permissions) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.username = username;
         this.password = password;
-        accountNonExpired = true;
+        this.roles = roles;
+        this.permissions = permissions;
     }
 
     public Account() {
@@ -132,15 +184,18 @@ public class Account {
     @Override
     public String toString() {
         return "Account{" +
-                "firstName='" + firstName + '\'' +
+                "username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
-                ", admin=" + admin +
-                ", enabled=" + enabled +
-                ", bannedUser=" + bannedUser +
-                ", accountNonExpired=" + accountNonExpired +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
+                ", gender=" + gender +
+                ", locale='" + locale + '\'' +
+                ", pictureUrl='" + pictureUrl + '\'' +
+                ", location='" + location + '\'' +
+                ", isRemembered=" + isRemembered +
+                ", roles=" + roles +
+                ", permissions=" + permissions +
                 '}';
     }
 
@@ -151,29 +206,38 @@ public class Account {
 
         Account account = (Account) o;
 
-        if (isAdmin() != account.isAdmin()) return false;
-        if (isEnabled() != account.isEnabled()) return false;
-        if (isBannedUser() != account.isBannedUser()) return false;
-        if (isAccountNonExpired() != account.isAccountNonExpired()) return false;
+        if (isRemembered() != account.isRemembered()) return false;
+        if (!getUsername().equals(account.getUsername())) return false;
+        if (getPassword() != null ? !getPassword().equals(account.getPassword()) : account.getPassword() != null)
+            return false;
         if (!getFirstName().equals(account.getFirstName())) return false;
         if (!getLastName().equals(account.getLastName())) return false;
         if (!getEmail().equals(account.getEmail())) return false;
-        if (!getUsername().equals(account.getUsername())) return false;
-        return getPassword() != null ? getPassword().equals(account.getPassword()) : account.getPassword() == null;
+        if (getGender() != account.getGender()) return false;
+        if (getLocale() != null ? !getLocale().equals(account.getLocale()) : account.getLocale() != null) return false;
+        if (getPictureUrl() != null ? !getPictureUrl().equals(account.getPictureUrl()) : account.getPictureUrl() != null)
+            return false;
+        if (getLocation() != null ? !getLocation().equals(account.getLocation()) : account.getLocation() != null)
+            return false;
+        if (!getRoles().equals(account.getRoles())) return false;
+        return getPermissions().equals(account.getPermissions());
 
     }
 
     @Override
     public int hashCode() {
-        int result = getFirstName().hashCode();
+        int result = getUsername().hashCode();
+        result = 31 * result + (getPassword() != null ? getPassword().hashCode() : 0);
+        result = 31 * result + getFirstName().hashCode();
         result = 31 * result + getLastName().hashCode();
         result = 31 * result + getEmail().hashCode();
-        result = 31 * result + (isAdmin() ? 1 : 0);
-        result = 31 * result + (isEnabled() ? 1 : 0);
-        result = 31 * result + (isBannedUser() ? 1 : 0);
-        result = 31 * result + (isAccountNonExpired() ? 1 : 0);
-        result = 31 * result + getUsername().hashCode();
-        result = 31 * result + (getPassword() != null ? getPassword().hashCode() : 0);
+        result = 31 * result + (getGender() != null ? getGender().hashCode() : 0);
+        result = 31 * result + (getLocale() != null ? getLocale().hashCode() : 0);
+        result = 31 * result + (getPictureUrl() != null ? getPictureUrl().hashCode() : 0);
+        result = 31 * result + (getLocation() != null ? getLocation().hashCode() : 0);
+        result = 31 * result + (isRemembered() ? 1 : 0);
+        result = 31 * result + getRoles().hashCode();
+        result = 31 * result + getPermissions().hashCode();
         return result;
     }
 }

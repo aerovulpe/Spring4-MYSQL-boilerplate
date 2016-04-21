@@ -5,6 +5,7 @@ import com.namespace.service.AccountManager;
 import com.namespace.service.dto.AccountForm;
 import com.namespace.service.dto.AccountFormAssembler;
 import com.namespace.service.dto.EnabledAccountsForm;
+import org.pac4j.core.profile.Gender;
 import org.pac4j.core.profile.UserProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.*;
@@ -68,8 +70,20 @@ public class AccountController extends BaseController {
 
     @RequestMapping(value = "/accounts/createDefaultUsers", method = GET)
     public String createDefaultAccount() throws Exception{
-        Account defaultAdmin = new Account("John", "Doe", "john@localhost", true, true, "admin", "adminPass");
-        Account defaultUser = new Account("Jane", "Doe", "jane@localhost", false, true, "user", "userPass");
+        Account defaultAdmin = new Account("admin", "adminPass", "John", "Doe", "john@localhost", new HashSet<String>(),
+                new HashSet<String>());
+        Account defaultUser = new Account("user", "userPass", "Jane", "Doe", "jane@localhost", new HashSet<String>(),
+                new HashSet<String>());
+        defaultAdmin.addRole(Account.ROLE_USER);
+        defaultAdmin.addRole(Account.ROLE_ADMIN);
+        defaultAdmin.setRemembered(true);
+        defaultAdmin.addPermission(Account.PERMISSION_ENABLED);
+        defaultAdmin.setGender(Gender.MALE);
+
+        defaultUser.addRole(Account.ROLE_USER);
+        defaultUser.addPermission(Account.PERMISSION_ENABLED);
+        defaultUser.setGender(Gender.FEMALE);
+
         accountManager.createNewAccount(defaultAdmin);
         accountManager.createNewAccount(defaultUser);
         return "redirect:/";

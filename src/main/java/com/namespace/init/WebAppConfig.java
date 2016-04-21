@@ -51,7 +51,7 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new LocaleChangeInterceptor());
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "OidcClient"))
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "OidcClient", "user"))
                 .addPathPatterns("/login/oidc");
         registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "FacebookClient"))
                 .addPathPatterns("/login/facebook");
@@ -87,7 +87,8 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     public LocalSessionFactoryBean sessionFactory() {
         LocalSessionFactoryBean sessionFactoryBean = new LocalSessionFactoryBean();
         sessionFactoryBean.setDataSource(dataSource());
-        sessionFactoryBean.setPackagesToScan(environment.getRequiredProperty(PROPERTY_NAME_ENTITYMANAGER_PACKAGES_TO_SCAN));
+        sessionFactoryBean.setPackagesToScan(environment
+                .getRequiredProperty(PROPERTY_NAME_ENTITYMANAGER_PACKAGES_TO_SCAN));
         sessionFactoryBean.setHibernateProperties(hibProperties());
         return sessionFactoryBean;
     }
@@ -101,8 +102,10 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
 
     private Properties hibProperties() {
         Properties properties = new Properties();
-        properties.put(PROPERTY_NAME_HIBERNATE_DIALECT, environment.getRequiredProperty(PROPERTY_NAME_HIBERNATE_DIALECT));
-        properties.put(PROPERTY_NAME_HIBERNATE_SHOW_SQL, environment.getRequiredProperty(PROPERTY_NAME_HIBERNATE_SHOW_SQL));
+        properties.put(PROPERTY_NAME_HIBERNATE_DIALECT, environment
+                .getRequiredProperty(PROPERTY_NAME_HIBERNATE_DIALECT));
+        properties.put(PROPERTY_NAME_HIBERNATE_SHOW_SQL, environment
+                .getRequiredProperty(PROPERTY_NAME_HIBERNATE_SHOW_SQL));
         return properties;
     }
 }

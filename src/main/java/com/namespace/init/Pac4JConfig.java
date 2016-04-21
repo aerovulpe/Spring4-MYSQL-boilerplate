@@ -1,10 +1,12 @@
 package com.namespace.init;
 
-import com.namespace.service.security.BCryptUsernamePasswordAuthenticator;
+import com.namespace.model.Account;
+import com.namespace.security.BCryptUsernamePasswordAuthenticator;
 import org.pac4j.cas.client.CasClient;
 import org.pac4j.cas.client.rest.CasRestBasicAuthClient;
 import org.pac4j.cas.credentials.authenticator.CasRestAuthenticator;
 import org.pac4j.core.authorization.Authorizer;
+import org.pac4j.core.authorization.DefaultRolesPermissionsAuthorizationGenerator;
 import org.pac4j.core.authorization.RequireAnyRoleAuthorizer;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
@@ -41,9 +43,14 @@ public class Pac4JConfig {
     BCryptUsernamePasswordAuthenticator passwordAuthenticator;
 
     @Bean
+    @SuppressWarnings("unchecked")
     public Config pac4JConfig() {
         Map<String, Authorizer> authorizers = new HashMap<>();
-        authorizers.put("admin", new RequireAnyRoleAuthorizer<>("ROLE_ADMIN"));
+        authorizers.put("admin", new RequireAnyRoleAuthorizer<>(Account.ROLE_ADMIN));
+        authorizers.put("user", new RequireAnyRoleAuthorizer<>(Account.ROLE_USER));
+
+        DefaultRolesPermissionsAuthorizationGenerator defaultRolesPermissionsAuthorizationGenerator =
+                new DefaultRolesPermissionsAuthorizationGenerator(new String[]{Account.ROLE_USER},new String[]{});
 
         OidcClient oidcClient = new OidcClient();
         oidcClient.setClientID(OID_CLIENT_ID);
@@ -53,22 +60,27 @@ public class Pac4JConfig {
         Map<String, String> paramMap = new HashMap<>();
         paramMap.put("prompt", "consent");
         oidcClient.setCustomParams(paramMap);
+        oidcClient.setAuthorizationGenerator(defaultRolesPermissionsAuthorizationGenerator);
 
         FacebookClient facebookClient = new FacebookClient();
         facebookClient.setKey(FACEBOOK_KEY);
         facebookClient.setSecret(FACEBOOK_SECRET);
+        facebookClient.setAuthorizationGenerator(defaultRolesPermissionsAuthorizationGenerator);
 
         TwitterClient twitterClient = new TwitterClient();
         twitterClient.setKey(TWITTER_KEY);
         twitterClient.setSecret(TWITTER_SECRET);
+        twitterClient.setAuthorizationGenerator(defaultRolesPermissionsAuthorizationGenerator);
 
         CasClient casClient = new CasClient();
         casClient.setCasLoginUrl("https://casserverpac4j.herokuapp.com/login");
+        casClient.setAuthorizationGenerator(defaultRolesPermissionsAuthorizationGenerator);
 
         ParameterClient parameterClient = new ParameterClient("token",
                 new JwtAuthenticator(JWT_SIGNING_SECRET, JWT_ENCRYPTION_SECRET));
         parameterClient.setSupportGetRequest(true);
         parameterClient.setSupportPostRequest(false);
+        parameterClient.setAuthorizationGenerators(defaultRolesPermissionsAuthorizationGenerator);
 
         return new Config(new Clients("http://localhost:" + PORT_NUMBER + "/callback",
                 oidcClient, facebookClient, twitterClient,

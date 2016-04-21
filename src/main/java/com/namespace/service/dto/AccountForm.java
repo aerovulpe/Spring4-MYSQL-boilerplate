@@ -12,7 +12,6 @@ public class AccountForm {
     private boolean admin;
     private boolean enabled;
     private boolean bannedUser;
-    private boolean accountNonExpired;
     private String username;
     private String password;
     private String passwordConfirmation;
@@ -82,14 +81,6 @@ public class AccountForm {
         this.bannedUser = bannedUser;
     }
 
-    public boolean isAccountNonExpired() {
-        return accountNonExpired;
-    }
-
-    public void setAccountNonExpired(boolean accountNonExpired) {
-        this.accountNonExpired = accountNonExpired;
-    }
-
     public String getPasswordConfirmation() {
         return passwordConfirmation;
     }
@@ -108,7 +99,7 @@ public class AccountForm {
 
     public AccountForm(@NotNull String username, @NotNull String firstName,
                        @NotNull String lastName, @NotNull String email, boolean admin,
-                       String password, boolean enabled, boolean bannedUser, boolean accountNonExpired) {
+                       String password, boolean enabled, boolean bannedUser) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -117,15 +108,15 @@ public class AccountForm {
         this.password = password;
         this.enabled = enabled;
         this.bannedUser = bannedUser;
-        this.accountNonExpired = accountNonExpired;
     }
 
     public AccountForm() {
     }
 
     public AccountForm(Account account) {
-        this(account.getUsername(), account.getFirstName(), account.getLastName(), account.getEmail(), account.isAdmin(),
-                account.getPassword(), account.isEnabled(), account.isBannedUser(), account.isAccountNonExpired());
+        this(account.getUsername(), account.getFirstName(), account.getLastName(), account.getEmail(),
+                account.hasRole(Account.ROLE_ADMIN), account.getPassword(),
+                account.hasPermission(Account.PERMISSION_ENABLED), account.getRoles().isEmpty());
     }
 
     @Override
@@ -137,7 +128,6 @@ public class AccountForm {
                 ", admin=" + admin +
                 ", enabled=" + enabled +
                 ", bannedUser=" + bannedUser +
-                ", accountNonExpired=" + accountNonExpired +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", passwordConfirmation='" + passwordConfirmation + '\'' +

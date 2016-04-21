@@ -1,4 +1,4 @@
-package com.namespace.service.security;
+package com.namespace.security;
 
 import com.namespace.model.Account;
 import com.namespace.service.AccountManager;
@@ -7,7 +7,6 @@ import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.util.CommonHelper;
 import org.pac4j.http.credentials.UsernamePasswordCredentials;
 import org.pac4j.http.credentials.authenticator.UsernamePasswordAuthenticator;
-import org.pac4j.http.credentials.authenticator.test.SimpleTestUsernamePasswordAuthenticator;
 import org.pac4j.http.profile.HttpProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,12 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+
 /**
  * Created by Aaron on 20/04/2016.
  */
 @Component
 public class BCryptUsernamePasswordAuthenticator implements UsernamePasswordAuthenticator {
-    private static final Logger logger = LoggerFactory.getLogger(SimpleTestUsernamePasswordAuthenticator.class);
+    private static final Logger logger = LoggerFactory.getLogger(BCryptUsernamePasswordAuthenticator.class);
 
     @Autowired
     private AccountManager accountManager;
@@ -63,11 +64,13 @@ public class BCryptUsernamePasswordAuthenticator implements UsernamePasswordAuth
         profile.addAttribute("family_name", account.getLastName());
         profile.addAttribute("name", account.getFirstName() + " " + account.getLastName());
         profile.addAttribute("display_name", account.getFirstName());
-
-        profile.addRole("ROLE_USER");
-        if (account.isAdmin()) {
-            profile.addRole("ROLE_ADMIN");
-        }
+        profile.addAttribute("gender", account.getGender());
+        profile.addAttribute("locale", account.getLocale());
+        profile.addAttribute("picture_url", account.getPictureUrl());
+        profile.addAttribute("location", account.getLocation());
+        profile.setRemembered(account.isRemembered());
+        profile.addRoles(new ArrayList<>(account.getRoles()));
+        profile.addPermissions(new ArrayList<>(account.getPermissions()));
 
         credentials.setUserProfile(profile);
     }

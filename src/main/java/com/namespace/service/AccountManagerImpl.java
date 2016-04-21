@@ -74,8 +74,8 @@ public class AccountManagerImpl implements AccountManager {
     @Override
     public Account closeAccount(String username) {
         Account account = accountDAO.getAccount(username);
-        account.setEnabled(false);
-        account.setAccountNonExpired(false);
+        account.getPermissions().clear();
+        account.getRoles().clear();
         try {
             return accountDAO.update(account) ? account : null;
         } catch (Exception e) {
@@ -117,7 +117,7 @@ public class AccountManagerImpl implements AccountManager {
     public boolean deactivateAccountByUsername(String username) {
 
         Account account = accountDAO.getAccount(username);
-        account.setEnabled(false);
+        account.removePermission(Account.PERMISSION_ENABLED);
         try {
             return accountDAO.update(account);
         } catch (Exception e) {

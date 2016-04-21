@@ -15,9 +15,22 @@
         <property name="firstName" column="firstName" type="string"/>
         <property name="lastName" column="lastName" type="string"/>
         <property name="email" column="email" type="string"/>
-        <property name="admin" column="admin" type="boolean"/>
-        <property name="enabled" column="enabled" type="boolean" />
-        <property name="bannedUser" column="bannedUser" type="boolean" />
-        <property name="accountNonExpired" column="accountNonExpired" />
+        <property name="gender" column="gender" type="string"/>
+        <property name="locale" column="locale" type="string"/>
+        <property name="pictureUrl" column="pictureUrl" type="string"/>
+        <property name="location" column="location" type="string"/>
+        <property name="isRemembered" column="isRemembered" type="boolean"/>
+        <set name="roles"
+             table="roles"
+             sort="natural">
+            <key column="username"/>
+            <element column="role" type="string"/>
+        </set>
+        <set name="permissions"
+             table="permissions"
+             sort="natural">
+            <key column="username"/>
+            <element column="permission" type="string"/>
+        </set>
     </class>
 </hibernate-mapping>
