@@ -53,24 +53,20 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
         registry.addInterceptor(new LocaleChangeInterceptor());
         registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "OidcClient", "user"))
                 .addPathPatterns("/login/oidc");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "FacebookClient"))
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "FacebookClient", "user"))
                 .addPathPatterns("/login/facebook");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "TwitterClient"))
-                .addPathPatterns("/login/twitter");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "FormClient"))
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "FormClient", "user"))
                 .addPathPatterns("/login/form");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "IndirectBasicAuthClient"))
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "IndirectBasicAuthClient", "user"))
                 .addPathPatterns("/login/iba");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "CasClient"))
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "CasClient", "user"))
                 .addPathPatterns("/login/cas");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "ParameterClient"))
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "ParameterClient", "user"))
                 .addPathPatterns("/login/par");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "DirectBasicAuthClient"))
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "DirectBasicAuthClient", "user"))
                 .addPathPatterns("/login/dba");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "CasRestBasicClient"))
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "CasRestBasicClient", "user"))
                 .addPathPatterns("/login/crb");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "FacebookClient", "admin"))
-                .addPathPatterns("/login/admin/facebook");
     }
 
     @Bean

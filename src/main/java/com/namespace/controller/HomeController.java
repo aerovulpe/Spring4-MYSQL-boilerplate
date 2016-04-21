@@ -52,18 +52,6 @@ public class HomeController extends BaseController {
         return "redirect:/";
     }
 
-    @RequestMapping("/login/admin/facebook")
-    public String adminFacebook(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
-        map.put("profile", getProfile(request, response));
-        return "redirect:/";
-    }
-
-    @RequestMapping("/login/twitter")
-    public String twitter(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
-        map.put("profile", getProfile(request, response));
-        return "redirect:/";
-    }
-
     @RequestMapping("/login/iba")
     public String form(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
         map.put("profile", getProfile(request, response));

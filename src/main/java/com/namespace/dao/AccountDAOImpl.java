@@ -22,7 +22,7 @@ public class AccountDAOImpl implements AccountDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<Account> findAll() {
-        List accounts = getCurrentSession().createQuery("from com.namespace.model.Account").list();
+        List accounts = getCurrentSession().createQuery("from Account").list();
         logger.info("retrieving the accounts from the database: " + accounts.toString());
         return accounts;
     }
@@ -59,8 +59,7 @@ public class AccountDAOImpl implements AccountDAO {
             return account;
 
         } catch (Exception e) {
-            logger.info("cannot retrieve the " + username + "'s account from the database. Should be for two reasons: " +
-                    "The account associated with this user doesn't exist, of there are not any accounts in the database");
+            logger.info("cannot retrieve the " + username + "'s account from the database.");
             return null;
         }
     }

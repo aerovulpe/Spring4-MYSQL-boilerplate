@@ -2,12 +2,13 @@ package com.namespace.init;
 
 import com.namespace.model.Account;
 import com.namespace.security.BCryptUsernamePasswordAuthenticator;
+import com.namespace.security.UserAccountAuthorizer;
 import org.pac4j.cas.client.CasClient;
 import org.pac4j.cas.client.rest.CasRestBasicAuthClient;
 import org.pac4j.cas.credentials.authenticator.CasRestAuthenticator;
 import org.pac4j.core.authorization.Authorizer;
 import org.pac4j.core.authorization.DefaultRolesPermissionsAuthorizationGenerator;
-import org.pac4j.core.authorization.RequireAnyRoleAuthorizer;
+import org.pac4j.core.authorization.RequireAllRolesAuthorizer;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
 import org.pac4j.http.client.direct.DirectBasicAuthClient;
@@ -16,7 +17,6 @@ import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
 import org.pac4j.jwt.credentials.authenticator.JwtAuthenticator;
 import org.pac4j.oauth.client.FacebookClient;
-import org.pac4j.oauth.client.TwitterClient;
 import org.pac4j.oidc.client.OidcClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -32,8 +32,6 @@ public class Pac4JConfig {
     private static final String OID_SECRET = "uR3D8ej1kIRPbqAFaxIE3HWh";
     private static final String FACEBOOK_KEY = "145278422258960";
     private static final String FACEBOOK_SECRET = "be21409ba8f39b5dae2a7de525484da8";
-    private static final String TWITTER_KEY = "CoxUiYwQOSFDReZYdjigBA";
-    private static final String TWITTER_SECRET = "2kAzunH5Btc4gRSaMr7D7MkyoJ5u1VzbOOzE8rBofs";
     private static final String JWT_SIGNING_SECRET = "12345678901234567890123456789012";
     private static final String JWT_ENCRYPTION_SECRET = "12345678901234567890123456789012";
 
@@ -41,16 +39,19 @@ public class Pac4JConfig {
 
     @Autowired
     BCryptUsernamePasswordAuthenticator passwordAuthenticator;
+    @Autowired
+    UserAccountAuthorizer userAccountAuthorizer;
 
     @Bean
     @SuppressWarnings("unchecked")
     public Config pac4JConfig() {
         Map<String, Authorizer> authorizers = new HashMap<>();
-        authorizers.put("admin", new RequireAnyRoleAuthorizer<>(Account.ROLE_ADMIN));
-        authorizers.put("user", new RequireAnyRoleAuthorizer<>(Account.ROLE_USER));
+        authorizers.put("admin", new RequireAllRolesAuthorizer<>(Account.ROLE_ADMIN, Account.ROLE_USER));
+        authorizers.put("user", userAccountAuthorizer);
 
         DefaultRolesPermissionsAuthorizationGenerator defaultRolesPermissionsAuthorizationGenerator =
-                new DefaultRolesPermissionsAuthorizationGenerator(new String[]{Account.ROLE_USER},new String[]{});
+                new DefaultRolesPermissionsAuthorizationGenerator(new String[]{Account.ROLE_USER},
+                        new String[]{Account.PERMISSION_ENABLED});
 
         OidcClient oidcClient = new OidcClient();
         oidcClient.setClientID(OID_CLIENT_ID);
@@ -67,11 +68,6 @@ public class Pac4JConfig {
         facebookClient.setSecret(FACEBOOK_SECRET);
         facebookClient.setAuthorizationGenerator(defaultRolesPermissionsAuthorizationGenerator);
 
-        TwitterClient twitterClient = new TwitterClient();
-        twitterClient.setKey(TWITTER_KEY);
-        twitterClient.setSecret(TWITTER_SECRET);
-        twitterClient.setAuthorizationGenerator(defaultRolesPermissionsAuthorizationGenerator);
-
         CasClient casClient = new CasClient();
         casClient.setCasLoginUrl("https://casserverpac4j.herokuapp.com/login");
         casClient.setAuthorizationGenerator(defaultRolesPermissionsAuthorizationGenerator);
@@ -83,11 +79,11 @@ public class Pac4JConfig {
         parameterClient.setAuthorizationGenerators(defaultRolesPermissionsAuthorizationGenerator);
 
         return new Config(new Clients("http://localhost:" + PORT_NUMBER + "/callback",
-                oidcClient, facebookClient, twitterClient,
+                oidcClient, facebookClient,
                 new FormClient("http://localhost:" + PORT_NUMBER + "/loginForm", passwordAuthenticator),
                 new IndirectBasicAuthClient(passwordAuthenticator), parameterClient,
                 new DirectBasicAuthClient(passwordAuthenticator),
                 new CasRestBasicAuthClient(new CasRestAuthenticator("https://casserverpac4j.herokuapp.com/"),
-                "Authorization", "Basic ")), authorizers);
+                        "Authorization", "Basic ")), authorizers);
     }
 }

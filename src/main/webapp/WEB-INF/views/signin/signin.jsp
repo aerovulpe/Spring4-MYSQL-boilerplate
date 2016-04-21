@@ -13,8 +13,6 @@
 
     <a href="login/iba">Basic Auth Sign In</a>
     <a href="login/facebook">Facebook Sign In</a>
-    <a href="login/admin/facebook">Facebook Sign In (Admin)</a>
-    <a href="login/twitter">Twitter Sign In</a>
     <a href="login/oidc">Google OpenID Connect Sign In</a>
 
     <footer>
