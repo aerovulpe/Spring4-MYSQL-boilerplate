@@ -59,7 +59,7 @@ public class AccountDAOImpl implements AccountDAO {
             return account;
 
         } catch (Exception e) {
-            logger.info("cannot retrieve the " + username + "'s account from the database.");
+            logger.info("cannot retrieve " + username + "'s account from the database.");
             return null;
         }
     }
