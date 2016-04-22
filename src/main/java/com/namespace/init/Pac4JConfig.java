@@ -2,12 +2,12 @@ package com.namespace.init;
 
 import com.namespace.model.Account;
 import com.namespace.security.BCryptUsernamePasswordAuthenticator;
+import com.namespace.security.HeaderTokenClient;
 import com.namespace.security.RolesPermissionsAuthorizationGenerator;
 import org.pac4j.core.authorization.Authorizer;
 import org.pac4j.core.authorization.RequireAllRolesAuthorizer;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
-import org.pac4j.http.client.direct.ParameterClient;
 import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
 import org.pac4j.jwt.credentials.authenticator.JwtAuthenticator;
 import org.pac4j.oauth.client.FacebookClient;
@@ -61,13 +61,11 @@ public class Pac4JConfig {
         facebookClient.setSecret(FACEBOOK_SECRET);
         facebookClient.setAuthorizationGenerator(rolesPermissionsAuthorizationGenerator);
 
-        ParameterClient parameterClient = new ParameterClient("access_token",
+        HeaderTokenClient headerTokenClient = new HeaderTokenClient("access_token",
                 new JwtAuthenticator(JWT_SIGNING_SECRET, JWT_ENCRYPTION_SECRET));
-        parameterClient.setSupportGetRequest(true);
-        parameterClient.setSupportPostRequest(true);
 
         return new Config(new Clients("http://localhost:" + PORT_NUMBER + "/callback",
                 oidcClient, facebookClient, new IndirectBasicAuthClient(passwordAuthenticator),
-                parameterClient), authorizers);
+                headerTokenClient), authorizers);
     }
 }
