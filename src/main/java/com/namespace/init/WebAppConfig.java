@@ -3,7 +3,9 @@ package com.namespace.init;
 import org.pac4j.core.config.Config;
 import org.pac4j.springframework.web.RequiresAuthenticationInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
@@ -42,6 +44,10 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     private Environment environment;
     @Autowired
     private Config pac4JConfig;
+    @Value("${pac4j.applicationLogout.defaultUrl:}")
+    private String defaultUrl;
+    @Value("${pac4j.applicationLogout.logoutUrlPattern:}")
+    private String logoutUrlPattern;
 
     @Override
     public void addResourceHandlers(final ResourceHandlerRegistry registry) {
@@ -57,6 +63,11 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
                 .addPathPatterns("/login/facebook");
         registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "IndirectBasicAuthClient", "user"))
                 .addPathPatterns("/login/iba");
+    }
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
+        return new PropertySourcesPlaceholderConfigurer();
     }
 
     @Bean

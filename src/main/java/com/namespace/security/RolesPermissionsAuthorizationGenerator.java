@@ -75,18 +75,20 @@ public class RolesPermissionsAuthorizationGenerator<U extends CommonProfile> imp
                 account.setLocation(profile.getLocation());
             }
 
-            account.setRoles(new HashSet<>(defaultRoles));
-            account.setPermissions(new HashSet<>(defaultPermissions));
+            if (defaultRoles != null) {
+                account.setRoles(new HashSet<>(defaultRoles));
+                profile.addRoles(defaultRoles);
+            }
+            if (defaultPermissions != null) {
+                account.setPermissions(new HashSet<>(defaultPermissions));
+                profile.addPermissions(defaultPermissions);
+            }
 
-            logger.info("Attempting to save account: " + account);
             try {
                 accountManager.createNewAccount(account);
             } catch (Exception e) {
                 logger.error("Could not save account!", e);
             }
-
-            profile.addRoles(defaultRoles);
-            profile.addPermissions(defaultPermissions);
         } else {
             logger.info("Roles & Permissions: " + account.getRoles() + account.getPermissions());
             profile.addRoles(new ArrayList<>(account.getRoles()));
