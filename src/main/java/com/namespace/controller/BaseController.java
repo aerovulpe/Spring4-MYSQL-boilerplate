@@ -1,9 +1,10 @@
 package com.namespace.controller;
 
+import com.namespace.util.Utils;
 import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.context.WebContext;
+import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.ProfileManager;
-import org.pac4j.core.profile.UserProfile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,9 +14,13 @@ import javax.servlet.http.HttpServletResponse;
  */
 public abstract class BaseController {
 
-    UserProfile getProfile(HttpServletRequest request, HttpServletResponse response) {
+    protected CommonProfile getProfile(HttpServletRequest request, HttpServletResponse response) {
         final WebContext context = new J2EContext(request, response);
         final ProfileManager manager = new ProfileManager(context);
-        return manager.get(true);
+        return (CommonProfile) manager.get(true);
+    }
+
+    protected String getUserName(HttpServletRequest request, HttpServletResponse response){
+        return Utils.getUserName(getProfile(request, response));
     }
 }

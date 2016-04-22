@@ -5,13 +5,20 @@
             <h1>Welcome!</h1>
             <p>Vestibulum id ligula porta felis euismod semper. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
 
-            <c:if test="${profile == null}">
-                <p>
-                    <a href="/login" class="btn btn-primary btn-large">Sign in &raquo;</a>
-                    <a href="/accounts/createDefaultUsers" class="btn btn-large btn-success"> Create System Users </a>
-                </p>
-
-            </c:if>
+            <c:choose>
+                <c:when test="${profile == null}">
+                    <p>
+                        <a href="/login" class="btn btn-primary btn-large">Sign in &raquo;</a>
+                        <a href="/accounts/createDefaultUsers" class="btn btn-large btn-success"> Create System Users </a>
+                    </p>
+                </c:when>
+                <c:otherwise>
+                    <p>
+                        <a href="jwt.html">Generate a JWT token</a><br />
+                        <a href="/logout?url=/" class="btn btn-primary btn-large">Sign out &raquo;</a>
+                    </p>
+                </c:otherwise>
+            </c:choose>
 
         </div>
     </div><!-- /content -->

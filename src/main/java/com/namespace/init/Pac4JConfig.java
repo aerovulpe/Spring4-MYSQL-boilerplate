@@ -26,8 +26,8 @@ public class Pac4JConfig {
     private static final String OID_SECRET = "uR3D8ej1kIRPbqAFaxIE3HWh";
     private static final String FACEBOOK_KEY = "145278422258960";
     private static final String FACEBOOK_SECRET = "be21409ba8f39b5dae2a7de525484da8";
-    private static final String JWT_SIGNING_SECRET = "12345678901234567890123456789012";
-    private static final String JWT_ENCRYPTION_SECRET = "12345678901234567890123456789012";
+    public static final String JWT_SIGNING_SECRET = "12345678901234567890123456789012";
+    public static final String JWT_ENCRYPTION_SECRET = "12345678901234567890123456789012";
 
     private static final short PORT_NUMBER = 8080;
 

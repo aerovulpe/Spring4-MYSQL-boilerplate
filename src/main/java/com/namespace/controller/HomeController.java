@@ -1,5 +1,6 @@
 package com.namespace.controller;
 
+import com.namespace.init.Pac4JConfig;
 import org.pac4j.core.profile.UserProfile;
 import org.pac4j.jwt.profile.JwtGenerator;
 import org.slf4j.Logger;
@@ -71,16 +72,17 @@ public class HomeController extends BaseController {
         return "redirect:/";
     }
 
-    @RequestMapping(value = "/jwt", method = GET)
+    @RequestMapping(value = "/jwt.html", method = GET)
     public String jwt(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
         final UserProfile profile = getProfile(request, response);
-        final JwtGenerator<UserProfile> generator = new JwtGenerator<>("12345678901234567890123456789012");
+        final JwtGenerator<UserProfile> generator = new JwtGenerator<>(Pac4JConfig.JWT_SIGNING_SECRET,
+                Pac4JConfig.JWT_ENCRYPTION_SECRET);
         String token = "";
         if (profile != null) {
             token = generator.generate(profile);
         }
         map.put("token", token);
-        return "jwt";
+        return "/jwt";
     }
 }
 
