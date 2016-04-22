@@ -2,6 +2,7 @@ package com.namespace.security;
 
 import com.namespace.model.Account;
 import com.namespace.service.AccountManager;
+import com.namespace.util.Utils;
 import org.pac4j.core.authorization.AuthorizationGenerator;
 import org.pac4j.core.profile.CommonProfile;
 import org.slf4j.Logger;
@@ -38,7 +39,8 @@ public class RolesPermissionsAuthorizationGenerator<U extends CommonProfile> imp
 
     @Override
     public void generate(U profile) {
-        Account account = accountManager.getAccountByUsername(profile.getTypedId());
+        Account account = accountManager
+                .getAccountByUsername(Utils.getUserName(profile));
 
         if (account == null) {
             // New user, grant default roles and permissions

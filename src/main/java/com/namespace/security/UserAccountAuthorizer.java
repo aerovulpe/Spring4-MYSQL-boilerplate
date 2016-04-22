@@ -2,6 +2,7 @@ package com.namespace.security;
 
 import com.namespace.model.Account;
 import com.namespace.service.AccountManager;
+import com.namespace.util.Utils;
 import org.pac4j.core.authorization.Authorizer;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.profile.CommonProfile;
@@ -29,14 +30,13 @@ public class UserAccountAuthorizer<P extends CommonProfile> implements Authorize
 
     @Override
     public boolean isAuthorized(WebContext context, P profile) {
-
-        boolean isHttpProfile = profile instanceof HttpProfile;
-
-        String username = isHttpProfile ? profile.getId() : profile.getTypedId();
+        String username = Utils.getUserName(profile);
         Account account = accountManager.getAccountByUsername(username);
 
         if (account == null) {
-            if (isHttpProfile)
+            // A user using username-password verification but hasn't signed up,
+            // isn't authorized.
+            if (profile instanceof HttpProfile)
                 return false;
 
             account = new Account();

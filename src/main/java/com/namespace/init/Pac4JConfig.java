@@ -4,16 +4,11 @@ import com.namespace.model.Account;
 import com.namespace.security.BCryptUsernamePasswordAuthenticator;
 import com.namespace.security.RolesPermissionsAuthorizationGenerator;
 import com.namespace.security.UserAccountAuthorizer;
-import org.pac4j.cas.client.CasClient;
-import org.pac4j.cas.client.rest.CasRestBasicAuthClient;
-import org.pac4j.cas.credentials.authenticator.CasRestAuthenticator;
 import org.pac4j.core.authorization.Authorizer;
 import org.pac4j.core.authorization.RequireAllRolesAuthorizer;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
-import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.direct.ParameterClient;
-import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
 import org.pac4j.jwt.credentials.authenticator.JwtAuthenticator;
 import org.pac4j.oauth.client.FacebookClient;
@@ -69,10 +64,6 @@ public class Pac4JConfig {
         facebookClient.setSecret(FACEBOOK_SECRET);
         facebookClient.setAuthorizationGenerator(rolesPermissionsAuthorizationGenerator);
 
-        CasClient casClient = new CasClient();
-        casClient.setCasLoginUrl("https://casserverpac4j.herokuapp.com/login");
-        casClient.setAuthorizationGenerator(rolesPermissionsAuthorizationGenerator);
-
         ParameterClient parameterClient = new ParameterClient("token",
                 new JwtAuthenticator(JWT_SIGNING_SECRET, JWT_ENCRYPTION_SECRET));
         parameterClient.setSupportGetRequest(true);
@@ -80,11 +71,7 @@ public class Pac4JConfig {
         parameterClient.setAuthorizationGenerators(rolesPermissionsAuthorizationGenerator);
 
         return new Config(new Clients("http://localhost:" + PORT_NUMBER + "/callback",
-                oidcClient, facebookClient,
-                new FormClient("http://localhost:" + PORT_NUMBER + "/loginForm", passwordAuthenticator),
-                new IndirectBasicAuthClient(passwordAuthenticator), parameterClient,
-                new DirectBasicAuthClient(passwordAuthenticator),
-                new CasRestBasicAuthClient(new CasRestAuthenticator("https://casserverpac4j.herokuapp.com/"),
-                        "Authorization", "Basic ")), authorizers);
+                oidcClient, facebookClient, new IndirectBasicAuthClient(passwordAuthenticator),
+                parameterClient), authorizers);
     }
 }
