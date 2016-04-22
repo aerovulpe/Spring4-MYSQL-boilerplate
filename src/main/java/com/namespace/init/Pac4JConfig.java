@@ -3,7 +3,6 @@ package com.namespace.init;
 import com.namespace.model.Account;
 import com.namespace.security.BCryptUsernamePasswordAuthenticator;
 import com.namespace.security.RolesPermissionsAuthorizationGenerator;
-import com.namespace.security.UserAccountAuthorizer;
 import org.pac4j.core.authorization.Authorizer;
 import org.pac4j.core.authorization.RequireAllRolesAuthorizer;
 import org.pac4j.core.client.Clients;
@@ -35,8 +34,6 @@ public class Pac4JConfig {
     @Autowired
     BCryptUsernamePasswordAuthenticator passwordAuthenticator;
     @Autowired
-    UserAccountAuthorizer userAccountAuthorizer;
-    @Autowired
     RolesPermissionsAuthorizationGenerator rolesPermissionsAuthorizationGenerator;
 
     @Bean
@@ -44,7 +41,7 @@ public class Pac4JConfig {
     public Config pac4JConfig() {
         Map<String, Authorizer> authorizers = new HashMap<>();
         authorizers.put("admin", new RequireAllRolesAuthorizer<>(Account.ROLE_ADMIN, Account.ROLE_USER));
-        authorizers.put("user", userAccountAuthorizer);
+        authorizers.put("user", new RequireAllRolesAuthorizer<>(Account.ROLE_USER));
 
         rolesPermissionsAuthorizationGenerator.setDefaultRoles(Account.ROLE_USER);
         rolesPermissionsAuthorizationGenerator.setDefaultPermissions(Account.PERMISSION_ENABLED);
@@ -68,7 +65,6 @@ public class Pac4JConfig {
                 new JwtAuthenticator(JWT_SIGNING_SECRET, JWT_ENCRYPTION_SECRET));
         parameterClient.setSupportGetRequest(true);
         parameterClient.setSupportPostRequest(true);
-        parameterClient.setAuthorizationGenerators(rolesPermissionsAuthorizationGenerator);
 
         return new Config(new Clients("http://localhost:" + PORT_NUMBER + "/callback",
                 oidcClient, facebookClient, new IndirectBasicAuthClient(passwordAuthenticator),
