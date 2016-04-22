@@ -2,12 +2,12 @@ package com.namespace.init;
 
 import com.namespace.model.Account;
 import com.namespace.security.BCryptUsernamePasswordAuthenticator;
+import com.namespace.security.RolesPermissionsAuthorizationGenerator;
 import com.namespace.security.UserAccountAuthorizer;
 import org.pac4j.cas.client.CasClient;
 import org.pac4j.cas.client.rest.CasRestBasicAuthClient;
 import org.pac4j.cas.credentials.authenticator.CasRestAuthenticator;
 import org.pac4j.core.authorization.Authorizer;
-import org.pac4j.core.authorization.DefaultRolesPermissionsAuthorizationGenerator;
 import org.pac4j.core.authorization.RequireAllRolesAuthorizer;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
@@ -41,6 +41,8 @@ public class Pac4JConfig {
     BCryptUsernamePasswordAuthenticator passwordAuthenticator;
     @Autowired
     UserAccountAuthorizer userAccountAuthorizer;
+    @Autowired
+    RolesPermissionsAuthorizationGenerator rolesPermissionsAuthorizationGenerator;
 
     @Bean
     @SuppressWarnings("unchecked")
@@ -49,9 +51,8 @@ public class Pac4JConfig {
         authorizers.put("admin", new RequireAllRolesAuthorizer<>(Account.ROLE_ADMIN, Account.ROLE_USER));
         authorizers.put("user", userAccountAuthorizer);
 
-        DefaultRolesPermissionsAuthorizationGenerator defaultRolesPermissionsAuthorizationGenerator =
-                new DefaultRolesPermissionsAuthorizationGenerator(new String[]{Account.ROLE_USER},
-                        new String[]{Account.PERMISSION_ENABLED});
+        rolesPermissionsAuthorizationGenerator.setDefaultRoles(Account.ROLE_USER);
+        rolesPermissionsAuthorizationGenerator.setDefaultPermissions(Account.PERMISSION_ENABLED);
 
         OidcClient oidcClient = new OidcClient();
         oidcClient.setClientID(OID_CLIENT_ID);
@@ -61,22 +62,22 @@ public class Pac4JConfig {
         Map<String, String> paramMap = new HashMap<>();
         paramMap.put("prompt", "consent");
         oidcClient.setCustomParams(paramMap);
-        oidcClient.setAuthorizationGenerator(defaultRolesPermissionsAuthorizationGenerator);
+        oidcClient.setAuthorizationGenerator(rolesPermissionsAuthorizationGenerator);
 
         FacebookClient facebookClient = new FacebookClient();
         facebookClient.setKey(FACEBOOK_KEY);
         facebookClient.setSecret(FACEBOOK_SECRET);
-        facebookClient.setAuthorizationGenerator(defaultRolesPermissionsAuthorizationGenerator);
+        facebookClient.setAuthorizationGenerator(rolesPermissionsAuthorizationGenerator);
 
         CasClient casClient = new CasClient();
         casClient.setCasLoginUrl("https://casserverpac4j.herokuapp.com/login");
-        casClient.setAuthorizationGenerator(defaultRolesPermissionsAuthorizationGenerator);
+        casClient.setAuthorizationGenerator(rolesPermissionsAuthorizationGenerator);
 
         ParameterClient parameterClient = new ParameterClient("token",
                 new JwtAuthenticator(JWT_SIGNING_SECRET, JWT_ENCRYPTION_SECRET));
         parameterClient.setSupportGetRequest(true);
         parameterClient.setSupportPostRequest(false);
-        parameterClient.setAuthorizationGenerators(defaultRolesPermissionsAuthorizationGenerator);
+        parameterClient.setAuthorizationGenerators(rolesPermissionsAuthorizationGenerator);
 
         return new Config(new Clients("http://localhost:" + PORT_NUMBER + "/callback",
                 oidcClient, facebookClient,
