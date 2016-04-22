@@ -53,7 +53,7 @@ public class BCryptUsernamePasswordAuthenticator implements UsernamePasswordAuth
 
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         if (!passwordEncoder.matches(password, account.getPassword())) {
-            throwsException("Username : '" + username + "' does not match password");
+            throwsException("Username : '" + username + "'s password does not match password in database");
         }
 
         final HttpProfile profile = new HttpProfile();

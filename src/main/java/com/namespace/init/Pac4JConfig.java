@@ -64,10 +64,10 @@ public class Pac4JConfig {
         facebookClient.setSecret(FACEBOOK_SECRET);
         facebookClient.setAuthorizationGenerator(rolesPermissionsAuthorizationGenerator);
 
-        ParameterClient parameterClient = new ParameterClient("token",
+        ParameterClient parameterClient = new ParameterClient("access_token",
                 new JwtAuthenticator(JWT_SIGNING_SECRET, JWT_ENCRYPTION_SECRET));
         parameterClient.setSupportGetRequest(true);
-        parameterClient.setSupportPostRequest(false);
+        parameterClient.setSupportPostRequest(true);
         parameterClient.setAuthorizationGenerators(rolesPermissionsAuthorizationGenerator);
 
         return new Config(new Clients("http://localhost:" + PORT_NUMBER + "/callback",
