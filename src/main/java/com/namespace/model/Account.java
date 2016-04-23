@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Entity
-@JsonIgnoreProperties({"password", "remembered"})
+@JsonIgnoreProperties({"username", "password", "remembered"})
 @Table(name = "accounts")
 public class Account {
     public static final String ROLE_USER = "ROLE_USER";

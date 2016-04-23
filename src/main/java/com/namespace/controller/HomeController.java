@@ -1,8 +1,8 @@
 package com.namespace.controller;
 
 import com.namespace.init.Pac4JConfig;
+import com.namespace.security.TimedJwtGenerator;
 import org.pac4j.core.profile.UserProfile;
-import org.pac4j.jwt.profile.JwtGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -75,7 +75,7 @@ public class HomeController extends BaseController {
     @RequestMapping(value = "/jwt.html", method = GET)
     public String jwt(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
         final UserProfile profile = getProfile(request, response);
-        final JwtGenerator<UserProfile> generator = new JwtGenerator<>(Pac4JConfig.JWT_SIGNING_SECRET,
+        final TimedJwtGenerator<UserProfile> generator = new TimedJwtGenerator<>(Pac4JConfig.JWT_SIGNING_SECRET,
                 Pac4JConfig.JWT_ENCRYPTION_SECRET);
         String token = "";
         if (profile != null) {

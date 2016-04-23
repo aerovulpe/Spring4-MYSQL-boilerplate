@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+
 /**
  * Created by Aaron on 10/04/2016.
  */
@@ -25,7 +27,7 @@ public class RESTAccountController extends BaseController {
     public RESTAccountController() {
     }
 
-    @RequestMapping("/api/account")
+    @RequestMapping(value = "/api/account", method = GET)
     public Account getAccount(HttpServletRequest request, HttpServletResponse response) {
         Account profile = accountManager.getAccountByUsername(getUserName(request, response));
         logger.info("Happy resting, " + profile.getFirstName());
