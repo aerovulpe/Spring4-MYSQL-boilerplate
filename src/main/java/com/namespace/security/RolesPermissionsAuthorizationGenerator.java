@@ -13,10 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Aaron on 22/04/2016.
@@ -57,23 +54,24 @@ public class RolesPermissionsAuthorizationGenerator<U extends CommonProfile> imp
             account.setUsername(username);
             account.setEmail(profile.getEmail());
             account.setLastName(profile.getFamilyName());
+
             if (profile instanceof OidcProfile) {
-                account.setFirstName(profile.getAttribute("given_name", String.class));
+                // OidcProfile doesn't properly implement CommonProfile for some reason :/
+                profile.addAttribute("first_name", profile.getAttribute("given_name"));
                 if (profile.getAttribute("gender").equals("male"))
-                    account.setGender(Gender.MALE);
+                    profile.addAttribute("gender", Gender.MALE);
                 else if (profile.getAttribute("gender").equals("female"))
-                    account.setGender(Gender.FEMALE);
+                    profile.addAttribute("gender", Gender.FEMALE);
                 else
-                    account.setGender(Gender.UNSPECIFIED);
-                account.setLocale(profile.getAttribute("locale", String.class));
-                account.setPictureUrl(profile.getAttribute("picture", String.class));
-            } else {
-                account.setFirstName(profile.getFirstName());
-                account.setPictureUrl(profile.getPictureUrl());
-                account.setGender(profile.getGender());
-                account.setLocale(profile.getLocale().toLanguageTag());
-                account.setLocation(profile.getLocation());
+                    profile.addAttribute("gender", Gender.UNSPECIFIED);
+                profile.addAttribute("locale", Locale.forLanguageTag(profile.getAttribute("locale", String.class)));
+                profile.addAttribute("picture_url", profile.getAttribute("picture"));
             }
+            account.setFirstName(profile.getFirstName());
+            account.setPictureUrl(profile.getPictureUrl());
+            account.setGender(profile.getGender());
+            account.setLocale(profile.getLocale().toLanguageTag());
+            account.setLocation(profile.getLocation());
 
             if (defaultRoles != null) {
                 account.setRoles(new HashSet<>(defaultRoles));

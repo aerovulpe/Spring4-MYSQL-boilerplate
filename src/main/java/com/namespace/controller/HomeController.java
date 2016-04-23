@@ -2,6 +2,7 @@ package com.namespace.controller;
 
 import com.namespace.init.Pac4JConfig;
 import com.namespace.security.TimedJwtGenerator;
+import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.UserProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,9 +29,9 @@ public class HomeController extends BaseController {
 
     @RequestMapping(value = "/", method = GET)
     public String home(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
-        UserProfile profile = getProfile(request, response);
+        CommonProfile profile = getProfile(request, response);
         if (profile != null)
-            logger.info("Welcome home, " + profile.getAttribute("name") + "!");
+            logger.info("Welcome home, " + profile.getFirstName() + "!");
         map.put("profile", profile);
         return "/home/home";
     }

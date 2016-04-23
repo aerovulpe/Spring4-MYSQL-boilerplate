@@ -59,7 +59,7 @@
                                 <%--
                                 <p>Frank's account - 334343 &nbsp;</p>
                                 --%>
-                            <p><c:out value="${profile.name}"></c:out>${fn:escapeXml(account_owner_label)}
+                            <p><c:out value="${profile.attributes.name}"></c:out>${fn:escapeXml(account_owner_label)}
                                 &nbsp;</p>
                         </li>
                         <li>

@@ -31,7 +31,7 @@ public class AccountDAOImpl implements AccountDAO {
     @SuppressWarnings("unchecked")
     public List<Account> findEnabled() {
         List<Account> accounts = getCurrentSession()
-                .createQuery("from Account as user where 'ENABLED' in elements(user.permissions)").list();
+                .createQuery("from Account as user where 'ENABLED' in elements(permissions)").list();
 
         logger.info("retrieving the accounts from the database: " + accounts.toString());
 
@@ -42,7 +42,7 @@ public class AccountDAOImpl implements AccountDAO {
     @SuppressWarnings("unchecked")
     public List<Account> findDisabled() {
         List<Account> accounts = getCurrentSession()
-                .createQuery("from Account as user where 'ENABLED' not in elements(user.permissions)").list();
+                .createQuery("from Account as user where 'ENABLED' not in elements(permissions)").list();
 
         logger.info("retrieving the accounts from the database: " + accounts.toString());
 

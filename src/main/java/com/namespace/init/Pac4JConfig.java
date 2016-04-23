@@ -44,7 +44,8 @@ public class Pac4JConfig {
         authorizers.put("user", new RequireAllRolesAuthorizer<>(Account.ROLE_USER));
 
         rolesPermissionsAuthorizationGenerator.setDefaultRoles(Account.ROLE_USER);
-        rolesPermissionsAuthorizationGenerator.setDefaultPermissions(Account.PERMISSION_ENABLED);
+        rolesPermissionsAuthorizationGenerator.setDefaultPermissions(Account.PERMISSION_ENABLED,
+                Account.PERMISSION_EMAIL_VERTIFIED);
 
         OidcClient oidcClient = new OidcClient();
         oidcClient.setClientID(OID_CLIENT_ID);

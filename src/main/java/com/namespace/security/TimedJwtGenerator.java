@@ -41,12 +41,17 @@ public class TimedJwtGenerator<U extends UserProfile> extends JwtGenerator<U> {
 
     public String generate(U profile, int numOfDays) {
         CommonHelper.assertNotNull("profile", profile);
-        CommonHelper.assertNull("profile.sub", profile.getAttribute(JwtConstants.SUBJECT));
+        // CommonHelper.assertNull("profile.sub", profile.getAttribute(JwtConstants.SUBJECT));
         CommonHelper.assertNull("profile.iat", profile.getAttribute(JwtConstants.ISSUE_TIME));
         CommonHelper.assertNull(INTERNAL_ROLES, profile.getAttribute(INTERNAL_ROLES));
         CommonHelper.assertNull(INTERNAL_PERMISSIONS, profile.getAttribute(INTERNAL_PERMISSIONS));
         CommonHelper.assertNotBlank("signingSecret", getSigningSecret());
         CommonHelper.assertNotNull("jwsAlgorithm", getJwsAlgorithm());
+
+        // Hack for OidcProfile
+        if (profile.getAttribute(JwtConstants.SUBJECT) != null) {
+            profile.addAttribute(JwtConstants.SUBJECT, profile.getTypedId());
+        }
 
         try {
             // Create HMAC signer

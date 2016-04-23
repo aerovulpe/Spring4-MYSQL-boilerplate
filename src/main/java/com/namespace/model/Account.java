@@ -15,6 +15,7 @@ public class Account {
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
 
     public static final String PERMISSION_ENABLED = "ENABLED";
+    public static final String PERMISSION_EMAIL_VERTIFIED = "EMAIL_VERIFIED";
 
     @Id
     @Column(name = "username", unique = true, nullable = false)
