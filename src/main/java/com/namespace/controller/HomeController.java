@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 /**
  * Handles requests for the application home page.
@@ -39,7 +38,7 @@ public class HomeController extends BaseController {
     @RequestMapping(value = "/loginfailed", method = GET)
     public String loginError(ModelMap model) {
         model.addAttribute("error", "true");
-        return "/login/login";
+        return "/signin/signin";
     }
 
     @RequestMapping(value = "/login", method = GET)
@@ -61,13 +60,6 @@ public class HomeController extends BaseController {
 
     @RequestMapping("/login/oidc")
     public String oidc(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
-        map.put("profile", getProfile(request, response));
-        return "redirect:/";
-    }
-
-
-    @RequestMapping(value = "/jwt", method = POST)
-    public String restJwt(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
         map.put("profile", getProfile(request, response));
         return "redirect:/";
     }

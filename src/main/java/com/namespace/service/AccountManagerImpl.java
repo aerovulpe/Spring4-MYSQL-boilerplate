@@ -68,7 +68,8 @@ public class AccountManagerImpl implements AccountManager {
 
     @Override
     public Account getEnabledAccount(String username) {
-        return accountDAO.getAccount(username);
+        Account account = accountDAO.getAccount(username);
+        return account.hasPermission(Account.PERMISSION_ENABLED) ? account : null;
     }
 
     @Override
@@ -94,6 +95,8 @@ public class AccountManagerImpl implements AccountManager {
 
         try {
             logger.info("Trying to create a new account: " + account.toString());
+            account.addRole(Account.ROLE_USER);
+            account.addPermission(Account.PERMISSION_ENABLED);
             this.accountDAO.create(account);
             logger.info("New account created successfully");
         } catch (Exception e) {
@@ -104,7 +107,6 @@ public class AccountManagerImpl implements AccountManager {
 
     @Override
     public List<Account> getEnabledAccounts() {
-
         return accountDAO.findEnabled();
     }
 
@@ -115,7 +117,6 @@ public class AccountManagerImpl implements AccountManager {
 
     @Override
     public boolean deactivateAccountByUsername(String username) {
-
         Account account = accountDAO.getAccount(username);
         account.removePermission(Account.PERMISSION_ENABLED);
         try {

@@ -11,9 +11,10 @@
 
 <div class="container" style="margin-top: -0px; padding-right: 0px; padding-top: 20px;">
 
-    <a href="login/iba">Basic Auth Sign In</a>
-    <a href="login/facebook">Facebook Sign In</a>
-    <a href="login/oidc">Google OpenID Connect Sign In</a>
+    <a>Sign In: </a>
+    <a href="login/iba">Basic Auth</a>
+    <a href="login/facebook">Facebook</a>
+    <a href="login/oidc">Google OpenID Connect</a>
 
     <footer>
         <p>Vestibulum id ligula porta felis euismod semper.</p>

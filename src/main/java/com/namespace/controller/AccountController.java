@@ -69,7 +69,7 @@ public class AccountController extends BaseController {
     }
 
     @RequestMapping(value = "/accounts/createDefaultUsers", method = GET)
-    public String createDefaultAccount() throws Exception{
+    public String createDefaultAccount() throws Exception {
         Account defaultAdmin = new Account("admin", "adminPass", "John", "Doe", "john@localhost", new HashSet<String>(),
                 new HashSet<String>());
         Account defaultUser = new Account("user", "userPass", "Jane", "Doe", "jane@localhost", new HashSet<String>(),
@@ -105,15 +105,17 @@ public class AccountController extends BaseController {
     public ModelAndView enabledAccountsListHome() {
         List<Account> enabledAccounts = accountManager.getEnabledAccounts();
 
-        ModelAndView mv = new ModelAndView("account/listEnabledAccounts");
-        mv.addObject("accountsList", enabledAccounts);
-        mv.addObject("enabledAccountsModel", new EnabledAccountsForm());
+        ModelAndView mv = new ModelAndView("/users/listEnabledUser");
+        mv.addObject("usersList", enabledAccounts);
+        mv.addObject("enabledUsersToDeactivateModel", new EnabledAccountsForm());
+
+        logger.info("ENABLED: " + enabledAccounts.toString());
 
         return mv;
     }
 
-    @RequestMapping(value = "/deactivateAccounts", method = PUT)
-    public String deactivateAccounts(@ModelAttribute("enabledAccountsModel") EnabledAccountsForm model) {
+    @RequestMapping(value = "/deactivateAccounts", method = POST)
+    public String deactivateAccounts(@ModelAttribute("enabledUsersToDeactivateModel") EnabledAccountsForm model) {
 
         logger.info("Enabled users (account IDs) to be deactivated: " + model);
 
@@ -139,13 +141,14 @@ public class AccountController extends BaseController {
 
         List<Account> disabledAccounts = accountManager.getDisabledAccounts();
 
-        ModelAndView mv = new ModelAndView("account/listDisabledAccounts");
-        mv.addObject("disabledAccountsList", disabledAccounts);
+        ModelAndView mv = new ModelAndView("/users/listDisabledUser");
+        mv.addObject("disabledAccounts", disabledAccounts);
+        mv.addObject("accountsToDeleteModel", new EnabledAccountsForm());
 
         return mv;
     }
 
-    @RequestMapping(value = "/deleteAccounts", method = DELETE)
+    @RequestMapping(value = "/deleteAccounts", method = POST)
     public String deleteAccounts(@ModelAttribute("accountsToDeleteModel") EnabledAccountsForm model) {
 
         logger.info("Accounts to be deleted: " + model);
