@@ -1,7 +1,7 @@
-CREATE TABLE accounts (username varchar(50) NOT NULL PRIMARY KEY, password varchar(60), firstName varchar(40) NOT NULL, lastName varchar(50) NOT NULL, email varchar(50) NOT NULL UNIQUE, gender varchar(15), locale varchar(40), pictureUrl varchar(100), location varchar(100), isRemembered boolean);
-CREATE TABLE roles (username varchar(50) NOT NULL, role varchar(25) NOT NULL);
-CREATE TABLE permissions (username varchar(50) NOT NULL, permission varchar(25) NOT NULL);
-CREATE TABLE ipTable (id int(6) NOT NULL AUTO_INCREMENT, username varchar(50) NOT NULL, ipAddress varchar(20) NOT NULL, banned boolean, timesSeen int(6) NOT NULL, firstSeen timestamp NOT NULL, lastSeen timestamp NOT NULL, PRIMARY KEY(id));
+CREATE TABLE accounts (username varchar(100) NOT NULL PRIMARY KEY, password varchar(60), firstName varchar(40) NOT NULL, lastName varchar(50) NOT NULL, email varchar(50) NOT NULL UNIQUE, gender varchar(15), locale varchar(40), pictureUrl varchar(100), location varchar(100), isRemembered boolean);
+CREATE TABLE roles (username varchar(100) NOT NULL, role varchar(25) NOT NULL);
+CREATE TABLE permissions (username varchar(100) NOT NULL, permission varchar(50) NOT NULL);
+CREATE TABLE ipTable (id int(6) NOT NULL AUTO_INCREMENT, username varchar(100) NOT NULL, ipAddress varchar(20) NOT NULL, banned boolean, timesSeen int(6) NOT NULL, firstSeen timestamp NOT NULL, lastSeen timestamp NOT NULL, PRIMARY KEY(id));
 CREATE USER 'springboilerplateserver'@'localhost' IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON * . * TO 'springboilerplateserver'@'localhost';
 FLUSH PRIVILEGES;
