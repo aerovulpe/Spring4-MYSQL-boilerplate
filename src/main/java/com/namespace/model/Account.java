@@ -1,7 +1,6 @@
 package com.namespace.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.Hibernate;
 import org.pac4j.core.profile.Gender;
 
 import javax.persistence.*;
@@ -51,8 +50,8 @@ public class Account {
     private Set<String> permissions;
 
     @JoinColumn(name = "username")
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "")
-    @MapKey(name = "username")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @MapKey(name = "ipAddress")
     private Map<String, IpAddress> ipAddresses;
 
     public String getFirstName() {
@@ -215,8 +214,10 @@ public class Account {
                 ", locale='" + locale + '\'' +
                 ", pictureUrl='" + pictureUrl + '\'' +
                 ", location='" + location + '\'' +
+                ", isRemembered=" + isRemembered +
                 ", roles=" + roles +
                 ", permissions=" + permissions +
+                ", ipAddresses=" + ipAddresses +
                 '}';
     }
 

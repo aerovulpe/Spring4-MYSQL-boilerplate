@@ -97,6 +97,19 @@ public class IpAddress {
     }
 
     @Override
+    public String toString() {
+        return "IpAddress{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", ipAddress='" + ipAddress + '\'' +
+                ", banned=" + banned +
+                ", timesSeen=" + timesSeen +
+                ", firstSeen=" + firstSeen +
+                ", lastSeen=" + lastSeen +
+                '}';
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

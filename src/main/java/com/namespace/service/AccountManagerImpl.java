@@ -4,6 +4,7 @@ import com.namespace.dao.AccountDAO;
 import com.namespace.dao.IpAddressDAO;
 import com.namespace.model.Account;
 import com.namespace.model.IpAddress;
+import com.namespace.security.BannedIpException;
 import com.namespace.service.dto.AccountForm;
 import com.namespace.service.dto.AccountFormAssembler;
 import com.namespace.service.validator.AccountCreationValidator;
@@ -197,6 +198,10 @@ public class AccountManagerImpl implements AccountManager {
             item.incrementTimesSeen();
             item.setLastSeen(new Timestamp(System.currentTimeMillis()));
             ipAddressDAO.update(item);
+            if (item.isBanned()) {
+                // Uh oh
+                throw new BannedIpException();
+            }
         }
 
         return item;

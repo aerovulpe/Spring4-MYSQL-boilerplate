@@ -64,8 +64,10 @@ public class BCryptUsernamePasswordAuthenticator implements UsernamePasswordAuth
 
         try {
             accountManager.seenIpAddress(account, ipAddress);
+        } catch (BannedIpException e) {
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.info("Database error", e);
         }
 
         profile.setId(ipAddress);
