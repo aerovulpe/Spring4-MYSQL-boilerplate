@@ -2,18 +2,19 @@ package com.namespace.security;
 
 import com.namespace.model.Account;
 import com.namespace.service.AccountManager;
+import org.pac4j.core.context.Pac4jConstants;
+import org.pac4j.core.credentials.UsernamePasswordCredentials;
+import org.pac4j.core.credentials.authenticator.UsernamePasswordAuthenticator;
 import org.pac4j.core.exception.CredentialsException;
-import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.util.CommonHelper;
-import org.pac4j.http.credentials.UsernamePasswordCredentials;
-import org.pac4j.http.credentials.authenticator.UsernamePasswordAuthenticator;
-import org.pac4j.http.profile.HttpProfile;
+import org.pac4j.http.profile.IpProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 
 /**
@@ -25,6 +26,8 @@ public class BCryptUsernamePasswordAuthenticator implements UsernamePasswordAuth
 
     @Autowired
     private AccountManager accountManager;
+    @Autowired
+    private HttpServletRequest request;
 
     public BCryptUsernamePasswordAuthenticator() {
     }
@@ -56,9 +59,17 @@ public class BCryptUsernamePasswordAuthenticator implements UsernamePasswordAuth
             throwsException("Username : '" + username + "'s password does not match password in database");
         }
 
-        final HttpProfile profile = new HttpProfile();
-        profile.setId(username);
-        profile.addAttribute(CommonProfile.USERNAME, username);
+        final IpProfile profile = new IpProfile();
+        String ipAddress = request.getRemoteAddr();
+
+        try {
+            accountManager.seenIpAddress(account, ipAddress);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        profile.setId(ipAddress);
+        profile.addAttribute(Pac4jConstants.USERNAME, username);
         profile.addAttribute("email", account.getEmail());
         profile.addAttribute("first_name", account.getFirstName());
         profile.addAttribute("family_name", account.getLastName());
@@ -73,6 +84,7 @@ public class BCryptUsernamePasswordAuthenticator implements UsernamePasswordAuth
         profile.addPermissions(new ArrayList<>(account.getPermissions()));
 
         credentials.setUserProfile(profile);
+        accountManager.updateAccount(account);
     }
 
     private void throwsException(final String message) {

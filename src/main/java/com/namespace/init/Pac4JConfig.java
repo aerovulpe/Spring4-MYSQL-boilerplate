@@ -5,13 +5,13 @@ import com.namespace.security.BCryptUsernamePasswordAuthenticator;
 import com.namespace.security.HeaderTokenClient;
 import com.namespace.security.RolesPermissionsAuthorizationGenerator;
 import com.namespace.security.TimedJwtAuthenticator;
-import org.pac4j.core.authorization.Authorizer;
-import org.pac4j.core.authorization.RequireAllRolesAuthorizer;
+import org.pac4j.core.authorization.authorizer.Authorizer;
+import org.pac4j.core.authorization.authorizer.RequireAllRolesAuthorizer;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
 import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
 import org.pac4j.oauth.client.FacebookClient;
-import org.pac4j.oidc.client.OidcClient;
+import org.pac4j.oidc.client.GoogleOidcClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 
@@ -47,15 +47,15 @@ public class Pac4JConfig {
         rolesPermissionsAuthorizationGenerator.setDefaultPermissions(Account.PERMISSION_ENABLED,
                 Account.PERMISSION_EMAIL_VERTIFIED);
 
-        OidcClient oidcClient = new OidcClient();
-        oidcClient.setClientID(OID_CLIENT_ID);
-        oidcClient.setSecret(OID_SECRET);
-        oidcClient.setDiscoveryURI("https://accounts.google.com/.well-known/openid-configuration");
-        oidcClient.setUseNonce(true);
+        GoogleOidcClient googleOidcClient = new GoogleOidcClient();
+        googleOidcClient.setClientID(OID_CLIENT_ID);
+        googleOidcClient.setSecret(OID_SECRET);
+        googleOidcClient.setDiscoveryURI("https://accounts.google.com/.well-known/openid-configuration");
+        googleOidcClient.setUseNonce(true);
         Map<String, String> paramMap = new HashMap<>();
         paramMap.put("prompt", "consent");
-        oidcClient.setCustomParams(paramMap);
-        oidcClient.setAuthorizationGenerator(rolesPermissionsAuthorizationGenerator);
+        googleOidcClient.setCustomParams(paramMap);
+        googleOidcClient.setAuthorizationGenerator(rolesPermissionsAuthorizationGenerator);
 
         FacebookClient facebookClient = new FacebookClient();
         facebookClient.setKey(FACEBOOK_KEY);
@@ -66,7 +66,7 @@ public class Pac4JConfig {
                 new TimedJwtAuthenticator(JWT_SIGNING_SECRET, JWT_ENCRYPTION_SECRET));
 
         return new Config(new Clients("http://localhost:" + PORT_NUMBER + "/callback",
-                oidcClient, facebookClient, new IndirectBasicAuthClient(passwordAuthenticator),
+                googleOidcClient, facebookClient, new IndirectBasicAuthClient(passwordAuthenticator),
                 headerTokenClient), authorizers);
     }
 }

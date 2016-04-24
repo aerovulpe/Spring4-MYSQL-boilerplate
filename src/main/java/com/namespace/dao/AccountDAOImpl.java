@@ -1,23 +1,18 @@
 package com.namespace.dao;
 
 import com.namespace.model.Account;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.pac4j.core.util.CommonHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-public class AccountDAOImpl implements AccountDAO {
+public class AccountDAOImpl extends SessionDAO<Account> implements AccountDAO{
 
     private static final Logger logger = LoggerFactory.getLogger(AccountDAOImpl.class);
-    @Autowired
-    private SessionFactory sessionFactory;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -118,10 +113,6 @@ public class AccountDAOImpl implements AccountDAO {
         logger.info("Confirmed: this account already exist.");
         getCurrentSession().delete(accountToDelete);
         return true;
-    }
-
-    private Session getCurrentSession() {
-        return sessionFactory.getCurrentSession();
     }
 
     private String getHashPassword(String password) {

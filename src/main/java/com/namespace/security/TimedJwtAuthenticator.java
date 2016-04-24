@@ -4,12 +4,14 @@ import com.nimbusds.jose.JWEObject;
 import com.nimbusds.jose.crypto.DirectDecrypter;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.*;
+import org.pac4j.core.credentials.TokenCredentials;
 import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.exception.TechnicalException;
+import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.core.profile.Gender;
 import org.pac4j.core.profile.ProfileHelper;
 import org.pac4j.core.profile.UserProfile;
 import org.pac4j.core.util.CommonHelper;
-import org.pac4j.http.credentials.TokenCredentials;
 import org.pac4j.jwt.JwtConstants;
 import org.pac4j.jwt.credentials.authenticator.JwtAuthenticator;
 import org.pac4j.jwt.profile.JwtGenerator;
@@ -100,7 +102,8 @@ public class TimedJwtAuthenticator extends JwtAuthenticator {
         attributes.remove(JwtGenerator.INTERNAL_ROLES);
         final List<String> permissions = (List<String>) attributes.get(JwtGenerator.INTERNAL_PERMISSIONS);
         attributes.remove(JwtGenerator.INTERNAL_PERMISSIONS);
-        final UserProfile profile = ProfileHelper.buildProfile(subject, attributes);
+        final CommonProfile profile = ProfileHelper.buildProfile(subject, attributes);
+        profile.addAttribute("gender", Gender.valueOf(profile.getAttribute("gender", String.class)));
         if (roles != null) {
             profile.addRoles(roles);
         }

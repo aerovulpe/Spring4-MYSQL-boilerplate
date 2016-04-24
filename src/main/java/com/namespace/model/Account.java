@@ -1,14 +1,16 @@
 package com.namespace.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.Hibernate;
 import org.pac4j.core.profile.Gender;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.Map;
 import java.util.Set;
 
 @Entity
-@JsonIgnoreProperties({"username", "password", "remembered"})
+@JsonIgnoreProperties({"username", "password", "remembered", "ipAddresses"})
 @Table(name = "accounts")
 public class Account {
     public static final String ROLE_USER = "ROLE_USER";
@@ -37,7 +39,7 @@ public class Account {
             name = "roles",
             joinColumns = @JoinColumn(name = "username")
     )
-    @Column(name="role")
+    @Column(name = "role")
     private Set<String> roles;
 
     @ElementCollection
@@ -45,8 +47,13 @@ public class Account {
             name = "permissions",
             joinColumns = @JoinColumn(name = "username")
     )
-    @Column(name="permission")
+    @Column(name = "permission")
     private Set<String> permissions;
+
+    @JoinColumn(name = "username")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "")
+    @MapKey(name = "username")
+    private Map<String, IpAddress> ipAddresses;
 
     public String getFirstName() {
         return firstName;
@@ -145,6 +152,14 @@ public class Account {
         isRemembered = remembered;
     }
 
+    public Map<String, IpAddress> getIpAddresses() {
+        return ipAddresses;
+    }
+
+    public void setIpAddresses(Map<String, IpAddress> ipAddresses) {
+        this.ipAddresses = ipAddresses;
+    }
+
     public void addRole(String role) {
         roles.add(role);
     }
@@ -161,12 +176,16 @@ public class Account {
         permissions.remove(permission);
     }
 
-    public boolean hasRole(String role){
+    public boolean hasRole(String role) {
         return roles.contains(role);
     }
 
-    public boolean hasPermission(String permission){
+    public boolean hasPermission(String permission) {
         return permissions.contains(permission);
+    }
+
+    public boolean hasPreviouslySeenIp(IpAddress ipAddress) {
+        return ipAddresses.containsKey(ipAddress.getIpAddress());
     }
 
     public Account(@NotNull String username, String password, @NotNull String firstName, @NotNull String lastName,
@@ -196,7 +215,6 @@ public class Account {
                 ", locale='" + locale + '\'' +
                 ", pictureUrl='" + pictureUrl + '\'' +
                 ", location='" + location + '\'' +
-                ", isRemembered=" + isRemembered +
                 ", roles=" + roles +
                 ", permissions=" + permissions +
                 '}';
@@ -209,7 +227,6 @@ public class Account {
 
         Account account = (Account) o;
 
-        if (isRemembered() != account.isRemembered()) return false;
         if (!getUsername().equals(account.getUsername())) return false;
         if (getPassword() != null ? !getPassword().equals(account.getPassword()) : account.getPassword() != null)
             return false;
@@ -238,7 +255,6 @@ public class Account {
         result = 31 * result + (getLocale() != null ? getLocale().hashCode() : 0);
         result = 31 * result + (getPictureUrl() != null ? getPictureUrl().hashCode() : 0);
         result = 31 * result + (getLocation() != null ? getLocation().hashCode() : 0);
-        result = 31 * result + (isRemembered() ? 1 : 0);
         result = 31 * result + getRoles().hashCode();
         result = 31 * result + getPermissions().hashCode();
         return result;

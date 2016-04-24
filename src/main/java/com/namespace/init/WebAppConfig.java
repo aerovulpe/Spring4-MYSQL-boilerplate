@@ -1,7 +1,8 @@
 package com.namespace.init;
 
+
 import org.pac4j.core.config.Config;
-import org.pac4j.springframework.web.RequiresAuthenticationInterceptor;
+import com.namespace.web.RequiresAuthenticationInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
@@ -26,7 +27,7 @@ import java.util.Properties;
  * Created by Aaron on 19/04/2016.
  */
 @Configuration
-@ComponentScan({"com.namespace", "org.pac4j.springframework.web"})
+@ComponentScan({"com.namespace"})
 @Import({Pac4JConfig.class, ViewConfig.class})
 @EnableWebMvc
 @EnableTransactionManagement
@@ -40,6 +41,7 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     private static final String PROPERTY_NAME_HIBERNATE_DIALECT = "hibernate.dialect";
     private static final String PROPERTY_NAME_HIBERNATE_SHOW_SQL = "hibernate.show_sql";
     private static final String PROPERTY_NAME_ENTITYMANAGER_PACKAGES_TO_SCAN = "entitymanager.packages.to.scan";
+    public static final String PROPERTY_NAME_JADIRA_USERTYPE_AUTO_REGISTER_USER_TYPES = "spring.jpa.properties.jadira.usertype.autoRegisterUserTypes";
 
     @Resource
     private Environment environment;
@@ -58,7 +60,7 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new LocaleChangeInterceptor());
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "OidcClient", "user"))
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "GoogleOidcClient", "user"))
                 .addPathPatterns("/login/oidc");
         registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "FacebookClient", "user"))
                 .addPathPatterns("/login/facebook");
@@ -113,6 +115,8 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
                 .getRequiredProperty(PROPERTY_NAME_HIBERNATE_DIALECT));
         properties.put(PROPERTY_NAME_HIBERNATE_SHOW_SQL, environment
                 .getRequiredProperty(PROPERTY_NAME_HIBERNATE_SHOW_SQL));
+        properties.put(PROPERTY_NAME_JADIRA_USERTYPE_AUTO_REGISTER_USER_TYPES,
+                environment.getRequiredProperty(PROPERTY_NAME_JADIRA_USERTYPE_AUTO_REGISTER_USER_TYPES));
         return properties;
     }
 }

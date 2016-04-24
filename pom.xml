@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.namespace</groupId>
     <artifactId>Spring4-boilerplate</artifactId>
@@ -32,14 +33,14 @@
     <properties>
         <roo.version>1.2.1.RELEASE</roo.version>
         <spring.version>4.2.5.RELEASE</spring.version>
-        <java.version>1.7</java.version>
+        <java.version>1.8</java.version>
         <aspectj.version>1.8.9</aspectj.version>
         <slf4j.version>1.7.21</slf4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
         <maven.version>3.1.0</maven.version>
-        <pac4j.version>1.8.8</pac4j.version>
-        <spring-webmvc-pac4j.version>1.0.2</spring-webmvc-pac4j.version>
+        <pac4j.version>1.9.0-SNAPSHOT</pac4j.version>
+        <spring-webmvc-pac4j.version>1.0.3-SNAPSHOT</spring-webmvc-pac4j.version>
         <hibernate.version>5.1.0.Final</hibernate.version>
         <mysql.connector.version>6.0.2</mysql.connector.version>
     </properties>
@@ -184,6 +185,33 @@
             <artifactId>spring-jdbc</artifactId>
             <version>${spring.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${spring.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${spring.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+            <version>4.0.4.RELEASE</version>
+        </dependency>
 
 
         <!-- javamail -->
@@ -227,28 +255,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>${spring.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>${spring.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>commons-digester</groupId>
             <artifactId>commons-digester</artifactId>
             <version>2.1</version>
@@ -270,11 +276,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
-    		<dependency>
-    			<groupId>jstl</groupId>
-    			<artifactId>jstl</artifactId>
-    			<version>1.2</version>
-    		</dependency>
+        <dependency>
+            <groupId>jstl</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
+        </dependency>
         <dependency>
             <groupId>javax.el</groupId>
             <artifactId>el-api</artifactId>
@@ -285,6 +291,11 @@
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>2.9.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jadira.usertype</groupId>
+            <artifactId>usertype.extended</artifactId>
+            <version>5.0.0.GA</version>
         </dependency>
         <!-- @Inject -->
         <dependency>
@@ -324,27 +335,17 @@
         <!-- pac4j -->
         <dependency>
             <groupId>org.pac4j</groupId>
-            <artifactId>spring-webmvc-pac4j</artifactId>
-            <version>${spring-webmvc-pac4j.version}</version>
+            <artifactId>pac4j-core</artifactId>
+            <version>${pac4j.version}</version>
         </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.pac4j</groupId>-->
+            <!--<artifactId>spring-webmvc-pac4j</artifactId>-->
+            <!--<version>${spring-webmvc-pac4j.version}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.pac4j</groupId>
             <artifactId>pac4j-oauth</artifactId>
-            <version>${pac4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.pac4j</groupId>
-            <artifactId>pac4j-openid</artifactId>
-            <version>${pac4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.pac4j</groupId>
-            <artifactId>pac4j-gae</artifactId>
-            <version>${pac4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.pac4j</groupId>
-            <artifactId>pac4j-cas</artifactId>
             <version>${pac4j.version}</version>
         </dependency>
         <dependency>
@@ -363,9 +364,9 @@
             <version>${pac4j.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-core</artifactId>
-            <version>4.0.4.RELEASE</version>
+            <groupId>org.pac4j</groupId>
+            <artifactId>spring-webmvc-pac4j</artifactId>
+            <version>1.0.3-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>
@@ -376,8 +377,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.3</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
             </plugin>
             <plugin>

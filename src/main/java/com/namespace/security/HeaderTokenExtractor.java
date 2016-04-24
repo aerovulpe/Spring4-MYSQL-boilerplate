@@ -1,13 +1,14 @@
 package com.namespace.security;
 
 import org.pac4j.core.context.WebContext;
-import org.pac4j.http.credentials.TokenCredentials;
-import org.pac4j.http.credentials.extractor.Extractor;
+import org.pac4j.core.credentials.TokenCredentials;
+import org.pac4j.core.credentials.extractor.CredentialsExtractor;
+
 
 /**
  * Created by Aaron on 22/04/2016.
  */
-class HeaderTokenExtractor implements Extractor<TokenCredentials> {
+class HeaderTokenExtractor implements CredentialsExtractor<TokenCredentials> {
     private final String tokenName;
     private final String clientName;
 

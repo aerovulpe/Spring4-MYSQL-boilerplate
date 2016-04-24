@@ -6,7 +6,7 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import org.pac4j.core.exception.TechnicalException;
-import org.pac4j.core.profile.UserProfile;
+import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.util.CommonHelper;
 import org.pac4j.jwt.JwtConstants;
 import org.pac4j.jwt.profile.JwtGenerator;
@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * Created by Aaron on 22/04/2016.
  */
-public class TimedJwtGenerator<U extends UserProfile> extends JwtGenerator<U> {
+public class TimedJwtGenerator<U extends CommonProfile> extends JwtGenerator<U> {
 
     public static final int LONG_ACCESS_TOKEN_TIME = 60;
 
@@ -48,7 +48,7 @@ public class TimedJwtGenerator<U extends UserProfile> extends JwtGenerator<U> {
         CommonHelper.assertNotBlank("signingSecret", getSigningSecret());
         CommonHelper.assertNotNull("jwsAlgorithm", getJwsAlgorithm());
 
-        // Hack for OidcProfile
+        // Hack for GoogleOidcProfile
         if (profile.getAttribute(JwtConstants.SUBJECT) != null) {
             profile.addAttribute(JwtConstants.SUBJECT, profile.getTypedId());
         }
