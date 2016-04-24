@@ -7,7 +7,6 @@ import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.authenticator.UsernamePasswordAuthenticator;
 import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.util.CommonHelper;
-import org.pac4j.http.profile.IpProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +58,7 @@ public class BCryptUsernamePasswordAuthenticator implements UsernamePasswordAuth
             throwsException("Username : '" + username + "'s password does not match password in database");
         }
 
-        final IpProfile profile = new IpProfile();
+        final HttpProfile profile = new HttpProfile();
         String ipAddress = request.getRemoteAddr();
 
         try {
@@ -67,10 +66,10 @@ public class BCryptUsernamePasswordAuthenticator implements UsernamePasswordAuth
         } catch (BannedIpException e) {
             throw e;
         } catch (Exception e) {
-            logger.info("Database error", e);
+            logger.error("Database error", e);
         }
 
-        profile.setId(ipAddress);
+        profile.setId(username);
         profile.addAttribute(Pac4jConstants.USERNAME, username);
         profile.addAttribute("email", account.getEmail());
         profile.addAttribute("first_name", account.getFirstName());
@@ -81,6 +80,7 @@ public class BCryptUsernamePasswordAuthenticator implements UsernamePasswordAuth
         profile.addAttribute("locale", account.getLocale());
         profile.addAttribute("picture_url", account.getPictureUrl());
         profile.addAttribute("location", account.getLocation());
+        profile.addAttribute("ip", ipAddress);
         profile.setRemembered(account.isRemembered());
         profile.addRoles(new ArrayList<>(account.getRoles()));
         profile.addPermissions(new ArrayList<>(account.getPermissions()));

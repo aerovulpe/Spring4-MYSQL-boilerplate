@@ -8,7 +8,6 @@ import org.pac4j.core.credentials.TokenCredentials;
 import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.exception.TechnicalException;
 import org.pac4j.core.profile.CommonProfile;
-import org.pac4j.core.profile.Gender;
 import org.pac4j.core.profile.ProfileHelper;
 import org.pac4j.core.profile.UserProfile;
 import org.pac4j.core.util.CommonHelper;
@@ -103,7 +102,7 @@ public class TimedJwtAuthenticator extends JwtAuthenticator {
         final List<String> permissions = (List<String>) attributes.get(JwtGenerator.INTERNAL_PERMISSIONS);
         attributes.remove(JwtGenerator.INTERNAL_PERMISSIONS);
         final CommonProfile profile = ProfileHelper.buildProfile(subject, attributes);
-        profile.addAttribute("gender", Gender.valueOf(profile.getAttribute("gender", String.class)));
+
         if (roles != null) {
             profile.addRoles(roles);
         }
