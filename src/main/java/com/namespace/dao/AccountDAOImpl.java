@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class AccountDAOImpl extends SessionDAO<Account> implements AccountDAO{
+public class AccountDAOImpl extends SessionDAO<Account, Long> implements AccountDAO {
 
     private static final Logger logger = LoggerFactory.getLogger(AccountDAOImpl.class);
 
@@ -47,7 +47,7 @@ public class AccountDAOImpl extends SessionDAO<Account> implements AccountDAO{
     @Override
     public Account getAccount(String username) {
         try {
-            Account account = getCurrentSession().get(Account.class, username);
+            Account account = getCurrentSession().bySimpleNaturalId(Account.class).load(username);
 
             logger.info("retrieving this account from the database: " + account.toString());
 
@@ -61,10 +61,10 @@ public class AccountDAOImpl extends SessionDAO<Account> implements AccountDAO{
 
 
     @Override
-    public void create(Account account) {
+    public Long create(Account account) {
         if (account.getPassword() != null)
             account.setPassword(getHashPassword(account.getPassword()));
-        getCurrentSession().save(account);
+        return (Long) getCurrentSession().save(account);
     }
 
     @Override

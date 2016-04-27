@@ -1,4 +1,4 @@
-package com.namespace.web.controller;
+package com.namespace.controller;
 
 import com.namespace.init.Pac4JConfig;
 import com.namespace.security.TimedJwtGenerator;

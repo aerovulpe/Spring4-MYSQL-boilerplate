@@ -1,6 +1,6 @@
-package com.namespace.web.controller.rest;
+package com.namespace.controller.rest;
 
-import com.namespace.web.controller.BaseController;
+import com.namespace.controller.BaseController;
 import com.namespace.model.Account;
 import com.namespace.util.Utils;
 import org.slf4j.Logger;

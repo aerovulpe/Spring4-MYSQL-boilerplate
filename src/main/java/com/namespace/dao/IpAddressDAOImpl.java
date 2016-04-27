@@ -8,11 +8,11 @@ import org.springframework.stereotype.Component;
  * Created by Aaron on 24/04/2016.
  */
 @Component
-public class IpAddressDAOImpl extends SessionDAO<IpAddress> implements IpAddressDAO {
+public class IpAddressDAOImpl extends SessionDAO<IpAddress, Integer> implements IpAddressDAO {
 
     @Override
-    public void create(IpAddress item) throws Exception {
-        getCurrentSession().save(item);
+    public Integer create(IpAddress item) throws Exception {
+        return (Integer) getCurrentSession().save(item);
     }
 
     @Override

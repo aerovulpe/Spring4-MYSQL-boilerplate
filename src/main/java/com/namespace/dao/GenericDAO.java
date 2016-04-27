@@ -1,8 +1,8 @@
 package com.namespace.dao;
 
-public interface GenericDAO<T> {
+public interface GenericDAO<T, I> {
 
-    void create(T item) throws Exception;
+    I create(T item) throws Exception;
 
     boolean update(T item) throws Exception;
 

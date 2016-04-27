@@ -19,6 +19,8 @@ public final class Utils {
 
     public static Account accountFromProfile(CommonProfile profile) {
         Account account = new Account();
+        if (profile.getAttribute("account_id") != null)
+            account.setId(profile.getAttribute("account_id", Long.class));
         account.setUsername(Utils.getUserName(profile));
         account.setFirstName(profile.getFirstName());
         account.setLastName(profile.getFamilyName());

@@ -4,7 +4,7 @@ import com.namespace.model.Account;
 
 import java.util.List;
 
-public interface AccountDAO extends GenericDAO<Account> {
+public interface AccountDAO extends GenericDAO<Account, Long> {
 
     List<Account> findAll();
 

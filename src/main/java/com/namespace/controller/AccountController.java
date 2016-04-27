@@ -1,4 +1,4 @@
-package com.namespace.web.controller;
+package com.namespace.controller;
 
 import com.namespace.model.Account;
 import com.namespace.service.AccountManager;

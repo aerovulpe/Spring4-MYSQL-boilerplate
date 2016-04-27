@@ -51,13 +51,14 @@ public class RolesPermissionsAuthorizationGenerator<U extends CommonProfile> imp
             }
 
             try {
-                accountManager.createNewAccount(Utils.accountFromProfile(profile));
+                profile.addAttribute("account_id", accountManager.createNewAccount(Utils.accountFromProfile(profile)));
             } catch (Exception e) {
                 logger.error("Could not save account!", e);
             }
         } else {
             profile.addRoles(new ArrayList<>(account.getRoles()));
             profile.addPermissions(new ArrayList<>(account.getPermissions()));
+            profile.addAttribute("account_id", account.getId());
         }
     }
 }

@@ -14,7 +14,7 @@ public interface AccountManager {
 
     Account getAccountByUsername(String username);
 
-    void createNewAccount(Account account) throws Exception;
+    Long createNewAccount(Account account) throws Exception;
 
     List<Account> getEnabledAccounts();
 

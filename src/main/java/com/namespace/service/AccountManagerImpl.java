@@ -96,17 +96,17 @@ public class AccountManagerImpl implements AccountManager {
     }
 
     @Override
-    public void createNewAccount(Account account) throws Exception {
+    public Long createNewAccount(Account account) throws Exception {
         logger.info("createNewAccount()");
 
         try {
             logger.info("Trying to create a new account: " + account.toString());
             account.addRole(Account.ROLE_USER);
             account.addPermission(Account.PERMISSION_ENABLED);
-            this.accountDAO.create(account);
-            logger.info("New account created successfully");
+            return this.accountDAO.create(account);
         } catch (Exception e) {
             logger.error(e.toString());
+            return null;
         }
 
     }

@@ -69,7 +69,8 @@ public class BCryptUsernamePasswordAuthenticator implements UsernamePasswordAuth
             logger.error("Database error", e);
         }
 
-        profile.setId(username);
+        profile.setId(account.getId());
+        profile.addAttribute("account_id", account.getId());
         profile.addAttribute(Pac4jConstants.USERNAME, username);
         profile.addAttribute("email", account.getEmail());
         profile.addAttribute("first_name", account.getFirstName());

@@ -1,6 +1,7 @@
 package com.namespace.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.NaturalId;
 import org.pac4j.core.profile.Gender;
 
 import javax.persistence.*;
@@ -19,6 +20,9 @@ public class Account {
     public static final String PERMISSION_EMAIL_VERTIFIED = "EMAIL_VERIFIED";
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @NaturalId
     @Column(name = "username", unique = true, nullable = false)
     private String username;
     private String password;
@@ -53,6 +57,14 @@ public class Account {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @MapKey(name = "ipAddress")
     private Map<String, IpAddress> ipAddresses;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getFirstName() {
         return firstName;
@@ -205,7 +217,8 @@ public class Account {
     @Override
     public String toString() {
         return "Account{" +
-                "username='" + username + '\'' +
+                "id=" + id +
+                ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
@@ -228,6 +241,7 @@ public class Account {
 
         Account account = (Account) o;
 
+        if (!getId().equals(account.getId())) return false;
         if (!getUsername().equals(account.getUsername())) return false;
         if (getPassword() != null ? !getPassword().equals(account.getPassword()) : account.getPassword() != null)
             return false;
@@ -247,7 +261,8 @@ public class Account {
 
     @Override
     public int hashCode() {
-        int result = getUsername().hashCode();
+        int result = getId().hashCode();
+        result = 31 * result + getUsername().hashCode();
         result = 31 * result + (getPassword() != null ? getPassword().hashCode() : 0);
         result = 31 * result + getFirstName().hashCode();
         result = 31 * result + getLastName().hashCode();

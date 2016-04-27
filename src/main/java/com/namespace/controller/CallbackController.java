@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package com.namespace.web.controller;
+package com.namespace.controller;
 
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;

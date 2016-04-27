@@ -1,4 +1,4 @@
-package com.namespace.web.controller;
+package com.namespace.controller;
 
 import com.namespace.util.Utils;
 import org.pac4j.core.context.J2EContext;
