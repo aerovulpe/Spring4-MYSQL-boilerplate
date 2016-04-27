@@ -66,6 +66,8 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
                 .addPathPatterns("/login/facebook");
         registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "IndirectBasicAuthClient", "user"))
                 .addPathPatterns("/login/iba");
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "DirectBasicAuthClient", "user"))
+                .addPathPatterns("/jwt/dba");
         registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "HeaderTokenClient", "user"))
                 .addPathPatterns("/api/account");
     }

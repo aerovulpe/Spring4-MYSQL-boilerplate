@@ -9,6 +9,7 @@ import org.pac4j.core.authorization.authorizer.Authorizer;
 import org.pac4j.core.authorization.authorizer.RequireAllRolesAuthorizer;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
+import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
 import org.pac4j.oauth.client.FacebookClient;
 import org.pac4j.oidc.client.GoogleOidcClient;
@@ -67,6 +68,7 @@ public class Pac4JConfig {
 
         return new Config(new Clients("http://localhost:" + PORT_NUMBER + "/callback",
                 googleOidcClient, facebookClient, new IndirectBasicAuthClient(passwordAuthenticator),
+                new DirectBasicAuthClient(passwordAuthenticator),
                 headerTokenClient), authorizers);
     }
 }

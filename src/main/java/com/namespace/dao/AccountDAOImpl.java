@@ -116,7 +116,6 @@ public class AccountDAOImpl extends SessionDAO<Account, Long> implements Account
     }
 
     private String getHashPassword(String password) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        return passwordEncoder.encode(password);
+        return new BCryptPasswordEncoder().encode(password);
     }
 }
