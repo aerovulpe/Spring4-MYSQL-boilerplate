@@ -12,7 +12,7 @@ public interface AccountManager {
 
     Account getEnabledAccount(String naturalId);
 
-    Account getAccountByUserNaturalId(String naturalId);
+    Account getAccountByNaturalId(String naturalId);
 
     Long createNewAccount(Account account) throws Exception;
 

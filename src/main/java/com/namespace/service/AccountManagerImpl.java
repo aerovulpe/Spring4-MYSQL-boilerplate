@@ -91,7 +91,7 @@ public class AccountManagerImpl implements AccountManager {
     }
 
     @Override
-    public Account getAccountByUserNaturalId(String naturalId) {
+    public Account getAccountByNaturalId(String naturalId) {
         return accountDAO.getAccount(naturalId);
     }
 
@@ -168,7 +168,7 @@ public class AccountManagerImpl implements AccountManager {
                 return null;
             } else {
                 account = AccountFormAssembler
-                        .updateAccountDetailsFromAccountForm(model, getAccountByUserNaturalId(naturalId));
+                        .updateAccountDetailsFromAccountForm(model, getAccountByNaturalId(naturalId));
             }
         } else {
             logger.info("updating password");
@@ -179,7 +179,7 @@ public class AccountManagerImpl implements AccountManager {
                 logger.info("validation error!");
                 return null;
             } else {
-                account = getAccountByUserNaturalId(naturalId);
+                account = getAccountByNaturalId(naturalId);
                 account.setPassword(model.getPassword());
             }
         }

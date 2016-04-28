@@ -39,7 +39,7 @@ public class RolesPermissionsAuthorizationGenerator<U extends CommonProfile> imp
 
     @Override
     public void generate(U profile) {
-        Account account = accountManager.getAccountByUserNaturalId(Utils.getUserNaturalId(profile));
+        Account account = accountManager.getAccountByNaturalId(Utils.getUserNaturalId(profile));
 
         if (account == null) {
             logger.info("Default Roles & Permissions.");
