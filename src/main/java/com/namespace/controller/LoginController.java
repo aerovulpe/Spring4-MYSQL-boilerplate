@@ -101,7 +101,7 @@ public class LoginController extends BaseController {
     public String gitkitSignIn(HttpServletRequest request, HttpServletResponse response) throws Exception {
         GitkitUser gitkitUser;
         GitkitClient gitkitClient = GitkitClient.createFromJson(getClass().getClassLoader()
-                .getResource("gitkit-server-config.json").getPath().substring(1));
+                .getResource("gitkit-server-config.json").getPath());
 
 
         gitkitUser = gitkitClient.validateTokenInRequest(request);
