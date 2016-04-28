@@ -23,7 +23,7 @@ public abstract class BaseController {
         return profile.isPresent() ? profile.get() : null;
     }
 
-    protected String getUserName(HttpServletRequest request, HttpServletResponse response){
-        return Utils.getUserName(getProfile(request, response));
+    protected String getUserNaturalId(HttpServletRequest request, HttpServletResponse response){
+        return Utils.getUserNaturalId(getProfile(request, response));
     }
 }

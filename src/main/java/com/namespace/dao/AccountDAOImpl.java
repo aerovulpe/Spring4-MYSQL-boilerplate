@@ -45,16 +45,16 @@ public class AccountDAOImpl extends SessionDAO<Account, Long> implements Account
     }
 
     @Override
-    public Account getAccount(String username) {
+    public Account getAccount(String naturalId) {
         try {
-            Account account = getCurrentSession().bySimpleNaturalId(Account.class).load(username);
+            Account account = getCurrentSession().bySimpleNaturalId(Account.class).load(naturalId);
 
             logger.info("retrieving this account from the database: " + account.toString());
 
             return account;
 
         } catch (Exception e) {
-            logger.info("cannot retrieve " + username + "'s account from the database.");
+            logger.info("cannot retrieve " + naturalId + "'s account from the database.");
             return null;
         }
     }
@@ -71,13 +71,13 @@ public class AccountDAOImpl extends SessionDAO<Account, Long> implements Account
     public boolean update(Account account) {
         logger.info("update()");
 
-        if (account == null || account.getUsername() == null)
+        if (account == null || account.getNaturalId() == null)
             return false;
 
         logger.info("verify if this account already exist " +
                 "in the database: " + account.toString());
 
-        Account accountToUpdate = getAccount(account.getUsername());
+        Account accountToUpdate = getAccount(account.getNaturalId());
         if (accountToUpdate == null) {
             logger.info("This account doesn't exist at the database or " +
                     "something was wrong.");
@@ -103,7 +103,7 @@ public class AccountDAOImpl extends SessionDAO<Account, Long> implements Account
 
     @Override
     public boolean remove(Account account) {
-        Account accountToDelete = getAccount(account.getUsername());
+        Account accountToDelete = getAccount(account.getNaturalId());
         if (accountToDelete == null) {
             logger.info("This account doesn't exist at the database or " +
                     "something was wrong.");

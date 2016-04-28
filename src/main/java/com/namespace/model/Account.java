@@ -6,11 +6,12 @@ import org.pac4j.core.profile.Gender;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 @Entity
-@JsonIgnoreProperties({"username", "password", "remembered", "ipAddresses"})
+@JsonIgnoreProperties({"naturalId", "password", "remembered", "ipAddresses"})
 @Table(name = "accounts")
 public class Account {
     public static final String ROLE_USER = "ROLE_USER";
@@ -23,8 +24,8 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NaturalId
-    @Column(name = "username", unique = true, nullable = false)
-    private String username;
+    @Column(name = "naturalId", unique = true, nullable = false)
+    private String naturalId;
     private String password;
 
     private String firstName;
@@ -40,7 +41,7 @@ public class Account {
     @ElementCollection
     @CollectionTable(
             name = "roles",
-            joinColumns = @JoinColumn(name = "username")
+            joinColumns = @JoinColumn(name = "userNaturalId")
     )
     @Column(name = "role")
     private Set<String> roles;
@@ -48,12 +49,12 @@ public class Account {
     @ElementCollection
     @CollectionTable(
             name = "permissions",
-            joinColumns = @JoinColumn(name = "username")
+            joinColumns = @JoinColumn(name = "userNaturalId")
     )
     @Column(name = "permission")
     private Set<String> permissions;
 
-    @JoinColumn(name = "username")
+    @JoinColumn(name = "userNaturalId")
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @MapKey(name = "ipAddress")
     private Map<String, IpAddress> ipAddresses;
@@ -90,12 +91,12 @@ public class Account {
         this.email = email;
     }
 
-    public String getUsername() {
-        return username;
+    public String getNaturalId() {
+        return naturalId;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setNaturalId(String naturalId) {
+        this.naturalId = naturalId;
     }
 
     public String getPassword() {
@@ -199,16 +200,16 @@ public class Account {
         return ipAddresses.containsKey(ipAddress.getIpAddress());
     }
 
-    public Account(@NotNull String username, String password, @NotNull String firstName, @NotNull String lastName,
-                   @NotNull String email, @NotNull Set<String> roles,
-                   @NotNull Set<String> permissions) {
+    public Account(@NotNull String naturalId, String password, @NotNull String firstName, @NotNull String lastName,
+                   @NotNull String email) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.username = username;
+        this.naturalId = naturalId;
         this.password = password;
-        this.roles = roles;
-        this.permissions = permissions;
+        this.roles = new HashSet<>();
+        this.permissions = new HashSet<>();
+        gender = Gender.UNSPECIFIED;
     }
 
     public Account() {
@@ -218,7 +219,7 @@ public class Account {
     public String toString() {
         return "Account{" +
                 "id=" + id +
-                ", username='" + username + '\'' +
+                ", naturalId='" + naturalId + '\'' +
                 ", password='" + password + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
@@ -242,7 +243,7 @@ public class Account {
         Account account = (Account) o;
 
         if (!getId().equals(account.getId())) return false;
-        if (!getUsername().equals(account.getUsername())) return false;
+        if (!getNaturalId().equals(account.getNaturalId())) return false;
         if (getPassword() != null ? !getPassword().equals(account.getPassword()) : account.getPassword() != null)
             return false;
         if (!getFirstName().equals(account.getFirstName())) return false;
@@ -262,7 +263,7 @@ public class Account {
     @Override
     public int hashCode() {
         int result = getId().hashCode();
-        result = 31 * result + getUsername().hashCode();
+        result = 31 * result + getNaturalId().hashCode();
         result = 31 * result + (getPassword() != null ? getPassword().hashCode() : 0);
         result = 31 * result + getFirstName().hashCode();
         result = 31 * result + getLastName().hashCode();

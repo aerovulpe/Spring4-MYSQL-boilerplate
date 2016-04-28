@@ -28,11 +28,11 @@ public class IpAddressDAOImpl extends SessionDAO<IpAddress, Integer> implements 
     }
 
     @Override
-    public IpAddress ipUsedByAccount(String ipAddress, String username) {
+    public IpAddress ipUsedByAccount(String ipAddress, String naturalId) {
         Query query = getCurrentSession()
-                .createQuery("select ip from IpAddress ip where ip.ipAddress = :ipAddress AND ip.username = :username")
+                .createQuery("select ip from IpAddress ip where ip.ipAddress = :ipAddress AND ip.userNaturalId = :userNaturalId")
                 .setParameter("ipAddress", ipAddress)
-                .setParameter("username", username);
+                .setParameter("userNaturalId", naturalId);
         return (IpAddress) query.uniqueResult();
     }
 }

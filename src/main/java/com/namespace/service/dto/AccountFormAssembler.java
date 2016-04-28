@@ -3,8 +3,6 @@ package com.namespace.service.dto;
 import com.namespace.model.Account;
 
 import javax.validation.constraints.NotNull;
-import java.util.Collections;
-import java.util.HashSet;
 
 public class AccountFormAssembler {
 
@@ -17,7 +15,7 @@ public class AccountFormAssembler {
 
     public static Account copyNewAccountFromAccountForm(@NotNull AccountForm form) {
         return new Account(form.getUsername(), form.getPassword(), form.getFirstName(), form.getLastName(),
-                form.getEmail(), new HashSet<>(Collections.singletonList(Account.ROLE_USER)), new HashSet<String>());
+                form.getEmail());
     }
 
     public static Account updateAccountDetailsFromAccountForm(@NotNull AccountForm form, Account account) {
@@ -36,17 +34,15 @@ public class AccountFormAssembler {
     }
 
     public static Account copyNewAccountFromAccountFormAdmin(@NotNull AccountForm form) {
-        HashSet<String> roles = new HashSet<>();
-        HashSet<String> permissions = new HashSet<>();
-
-        roles.add(Account.ROLE_USER);
+        Account account = new Account(form.getUsername(), form.getPassword(), form.getFirstName(), form.getLastName(),
+                form.getEmail());
+        account.addRole(Account.ROLE_USER);
         if (form.isAdmin())
-            roles.add(Account.ROLE_ADMIN);
+            account.addRole(Account.ROLE_ADMIN);
         if (form.isEnabled())
-            permissions.add(Account.PERMISSION_ENABLED);
+            account.addPermission(Account.PERMISSION_ENABLED);
 
-        return new Account(form.getUsername(), form.getPassword(), form.getFirstName(), form.getLastName(),
-                form.getEmail(), roles, permissions);
+        return account;
     }
 
     private static void extractCommons(AccountForm form, @NotNull Account account) {

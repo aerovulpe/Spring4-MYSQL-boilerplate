@@ -17,7 +17,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashSet;
 import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.*;
@@ -48,10 +47,10 @@ public class AccountController extends BaseController {
     /**
      * New update account form
      */
-    @RequestMapping(value = "/updateAccount/{username}/", method = GET)
-    public ModelAndView getNewUpdateAccountForm(@PathVariable String username) {
+    @RequestMapping(value = "/updateAccount/{naturalId}/", method = GET)
+    public ModelAndView getNewUpdateAccountForm(@PathVariable String naturalId) {
 
-        Account account = accountManager.getAccountByUsername(username);
+        Account account = accountManager.getAccountByNaturalId(naturalId);
 
         AccountForm accountForm = AccountFormAssembler
                 .createAccountForm(account);
@@ -70,10 +69,8 @@ public class AccountController extends BaseController {
 
     @RequestMapping(value = "/accounts/createDefaultUsers", method = GET)
     public String createDefaultAccount() throws Exception {
-        Account defaultAdmin = new Account("admin", "adminPass", "John", "Doe", "john@localhost", new HashSet<String>(),
-                new HashSet<String>());
-        Account defaultUser = new Account("user", "userPass", "Jane", "Doe", "jane@localhost", new HashSet<String>(),
-                new HashSet<String>());
+        Account defaultAdmin = new Account("admin", "adminPass", "John", "Doe", "john@localhost");
+        Account defaultUser = new Account("user", "userPass", "Jane", "Doe", "jane@localhost");
         defaultAdmin.addRole(Account.ROLE_USER);
         defaultAdmin.addRole(Account.ROLE_ADMIN);
         defaultAdmin.setRemembered(true);
@@ -89,12 +86,12 @@ public class AccountController extends BaseController {
         return "redirect:/";
     }
 
-    @RequestMapping(value = "/accounts/{username}/", method = PUT, params = "details")
-    public String updateAccount(@PathVariable String username,
+    @RequestMapping(value = "/accounts/{naturalId}/", method = PUT, params = "details")
+    public String updateAccount(@PathVariable String naturalId,
                                 @RequestParam(value = "details", required = false, defaultValue = "true") boolean details,
                                 @ModelAttribute("accountDetailsModel") AccountForm model, BindingResult result) {
-        return accountManager.updateAccount(username, details, model, result) != null ? "redirect:./" :
-                "/accounts/" + username + "/";
+        return accountManager.updateAccount(naturalId, details, model, result) != null ? "redirect:./" :
+                "/accounts/" + naturalId + "/";
     }
 
 
@@ -124,8 +121,8 @@ public class AccountController extends BaseController {
         logger.info("deactivatedAccounts: " + deactivatedAccounts);
 
         if (deactivatedAccounts != null) {
-            for (String username : deactivatedAccounts) {
-                accountManager.deactivateAccountByUsername(username);
+            for (String naturalId : deactivatedAccounts) {
+                accountManager.deactivateAccountByNaturalId(naturalId);
             }
         }
 
@@ -158,8 +155,8 @@ public class AccountController extends BaseController {
         logger.info("Accounts to be deleted: " + accountsToBeDeleted);
 
         if (accountsToBeDeleted != null) {
-            for (String username : accountsToBeDeleted) {
-                accountManager.deleteAccountByUsername(username);
+            for (String naturalId : accountsToBeDeleted) {
+                accountManager.deleteAccountByNaturalId(naturalId);
             }
         }
 

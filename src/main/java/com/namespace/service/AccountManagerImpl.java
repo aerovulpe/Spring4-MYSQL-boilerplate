@@ -73,14 +73,14 @@ public class AccountManagerImpl implements AccountManager {
     }
 
     @Override
-    public Account getEnabledAccount(String username) {
-        Account account = accountDAO.getAccount(username);
+    public Account getEnabledAccount(String naturalId) {
+        Account account = accountDAO.getAccount(naturalId);
         return account.hasPermission(Account.PERMISSION_ENABLED) ? account : null;
     }
 
     @Override
-    public Account closeAccount(String username) {
-        Account account = accountDAO.getAccount(username);
+    public Account closeAccount(String naturalId) {
+        Account account = accountDAO.getAccount(naturalId);
         account.getPermissions().clear();
         account.getRoles().clear();
         try {
@@ -91,8 +91,8 @@ public class AccountManagerImpl implements AccountManager {
     }
 
     @Override
-    public Account getAccountByUsername(String username) {
-        return accountDAO.getAccount(username);
+    public Account getAccountByNaturalId(String naturalId) {
+        return accountDAO.getAccount(naturalId);
     }
 
     @Override
@@ -122,8 +122,8 @@ public class AccountManagerImpl implements AccountManager {
     }
 
     @Override
-    public boolean deactivateAccountByUsername(String username) {
-        Account account = accountDAO.getAccount(username);
+    public boolean deactivateAccountByNaturalId(String naturalId) {
+        Account account = accountDAO.getAccount(naturalId);
         account.removePermission(Account.PERMISSION_ENABLED);
         try {
             return accountDAO.update(account);
@@ -133,8 +133,8 @@ public class AccountManagerImpl implements AccountManager {
     }
 
     @Override
-    public Account deleteAccountByUsername(String username) {
-        Account account = accountDAO.getAccount(username);
+    public Account deleteAccountByNaturalId(String naturalId) {
+        Account account = accountDAO.getAccount(naturalId);
 
         try {
             return accountDAO.remove(account) ? account : null;
@@ -157,7 +157,7 @@ public class AccountManagerImpl implements AccountManager {
     }
 
     @Override
-    public Account updateAccount(String username, boolean details, AccountForm model, BindingResult result) {
+    public Account updateAccount(String naturalId, boolean details, AccountForm model, BindingResult result) {
         Account account;
         if (details) {
             logger.info("updateAccount() : details");
@@ -168,7 +168,7 @@ public class AccountManagerImpl implements AccountManager {
                 return null;
             } else {
                 account = AccountFormAssembler
-                        .updateAccountDetailsFromAccountForm(model, getAccountByUsername(username));
+                        .updateAccountDetailsFromAccountForm(model, getAccountByNaturalId(naturalId));
             }
         } else {
             logger.info("updating password");
@@ -179,7 +179,7 @@ public class AccountManagerImpl implements AccountManager {
                 logger.info("validation error!");
                 return null;
             } else {
-                account = getAccountByUsername(username);
+                account = getAccountByNaturalId(naturalId);
                 account.setPassword(model.getPassword());
             }
         }
@@ -190,9 +190,9 @@ public class AccountManagerImpl implements AccountManager {
 
     @Override
     public IpAddress seenIpAddress(Account account, String ipAddress) throws Exception {
-        IpAddress item = ipAddressDAO.ipUsedByAccount(ipAddress, account.getUsername());
+        IpAddress item = ipAddressDAO.ipUsedByAccount(ipAddress, account.getNaturalId());
         if (item == null) {
-            item = new IpAddress(account.getUsername(), ipAddress);
+            item = new IpAddress(account.getNaturalId(), ipAddress);
             ipAddressDAO.create(item);
         } else {
             item.incrementTimesSeen();

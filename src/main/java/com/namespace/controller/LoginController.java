@@ -3,10 +3,11 @@ package com.namespace.controller;
 import com.google.identitytoolkit.GitkitClient;
 import com.google.identitytoolkit.GitkitUser;
 import com.namespace.init.Pac4JConfig;
-import com.namespace.security.HttpProfile;
+import com.namespace.model.Account;
+import com.namespace.security.GitKitProfile;
 import com.namespace.security.TimedJwtGenerator;
+import com.namespace.service.AccountManager;
 import org.pac4j.core.context.J2EContext;
-import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.ProfileManager;
 import org.slf4j.Logger;
@@ -24,6 +25,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -33,13 +35,15 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  * Handles requests for the application home page.
  */
 @Controller
-public class HomeController extends BaseController {
+public class LoginController extends BaseController {
 
-    private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
+    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
     @Autowired
     ServletContext servletContext;
+    @Autowired
+    AccountManager accountManager;
 
-    public HomeController() {
+    public LoginController() {
     }
 
     @RequestMapping(value = "/", method = GET)
@@ -97,7 +101,7 @@ public class HomeController extends BaseController {
     public String gitkitSignIn(HttpServletRequest request, HttpServletResponse response) throws Exception {
         GitkitUser gitkitUser;
         GitkitClient gitkitClient = GitkitClient.createFromJson(getClass().getClassLoader()
-                .getResource("gitkit-server-config.json").getPath());
+                .getResource("gitkit-server-config.json").getPath().substring(1));
 
 
         gitkitUser = gitkitClient.validateTokenInRequest(request);
@@ -107,14 +111,37 @@ public class HomeController extends BaseController {
                     + gitkitUser.getLocalId() + "<br> Provider: " + gitkitUser.getCurrentProvider();
             logger.info(userInfo);
 
-            ProfileManager<HttpProfile> httpProfileProfileManager =
+            ProfileManager<GitKitProfile> gitKitProfileProfileManager =
                     new ProfileManager<>(new J2EContext(request, response));
-            HttpProfile profile = new HttpProfile();
-            profile.addAttribute(Pac4jConstants.USERNAME, gitkitUser.getLocalId());
-            profile.addAttribute("email", gitkitUser.getEmail());
-            profile.addAttribute("name", gitkitUser.getName());
-            profile.addAttribute("picture_url", gitkitUser.getPhotoUrl());
-            httpProfileProfileManager.save(true, profile, false);
+            Account account = accountManager.getAccountByNaturalId(gitkitUser.getLocalId());
+            if (account == null) {
+                logger.info("New account");
+                String[] names = gitkitUser.getName().split(" ");
+                String lastName = names.length > 1 ? names[names.length - 1] : "";
+                account = new Account(gitkitUser.getLocalId(), null, names[0], lastName, gitkitUser.getEmail());
+                account.addRole(Account.ROLE_USER);
+                account.addPermission(Account.PERMISSION_ENABLED);
+                accountManager.createNewAccount(account);
+            }
+
+            logger.info("Account: " + account.toString());
+            final GitKitProfile profile = new GitKitProfile();
+            profile.setId(account.getNaturalId());
+            profile.addAttribute("account_id", account.getId());
+            profile.addAttribute("email", account.getEmail());
+            profile.addAttribute("first_name", account.getFirstName());
+            profile.addAttribute("family_name", account.getLastName());
+            profile.addAttribute("name", account.getFirstName() + " " + account.getLastName());
+            profile.addAttribute("display_name", account.getFirstName());
+            profile.addAttribute("gender", account.getGender());
+            profile.addAttribute("locale", account.getLocale());
+            profile.addAttribute("picture_url", account.getPictureUrl());
+            profile.addAttribute("location", account.getLocation());
+            profile.setRemembered(account.isRemembered());
+            profile.addRoles(new ArrayList<>(account.getRoles()));
+            profile.addPermissions(new ArrayList<>(account.getPermissions()));
+
+            gitKitProfileProfileManager.save(true, profile, false);
         }
 
         return "redirect:/";
