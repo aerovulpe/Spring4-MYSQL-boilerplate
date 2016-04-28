@@ -50,7 +50,7 @@ public class AccountController extends BaseController {
     @RequestMapping(value = "/updateAccount/{naturalId}/", method = GET)
     public ModelAndView getNewUpdateAccountForm(@PathVariable String naturalId) {
 
-        Account account = accountManager.getAccountByUserNaturalId(naturalId);
+        Account account = accountManager.getAccountByNaturalId(naturalId);
 
         AccountForm accountForm = AccountFormAssembler
                 .createAccountForm(account);

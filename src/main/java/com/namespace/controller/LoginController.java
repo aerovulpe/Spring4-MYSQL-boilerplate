@@ -113,14 +113,14 @@ public class LoginController extends BaseController {
 
             ProfileManager<GitKitProfile> gitKitProfileProfileManager =
                     new ProfileManager<>(new J2EContext(request, response));
-            Account account = accountManager.getAccountByUserNaturalId(gitkitUser.getLocalId());
+            Account account = accountManager.getAccountByNaturalId(gitkitUser.getLocalId());
             if (account == null) {
                 logger.info("New account");
                 String[] names = gitkitUser.getName().split(" ");
-                account = new Account(gitkitUser.getLocalId(), null, names[0], names[1], gitkitUser.getEmail());
+                String lastName = names.length > 1 ? names[names.length - 1] : "";
+                account = new Account(gitkitUser.getLocalId(), null, names[0], lastName, gitkitUser.getEmail());
                 account.addRole(Account.ROLE_USER);
                 account.addPermission(Account.PERMISSION_ENABLED);
-                account.addPermission(Account.PERMISSION_EMAIL_VERTIFIED);
                 accountManager.createNewAccount(account);
             }
 
