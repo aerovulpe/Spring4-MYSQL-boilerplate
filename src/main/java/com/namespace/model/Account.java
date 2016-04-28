@@ -209,6 +209,7 @@ public class Account {
         this.password = password;
         this.roles = roles;
         this.permissions = permissions;
+        gender = Gender.UNSPECIFIED;
     }
 
     public Account() {
