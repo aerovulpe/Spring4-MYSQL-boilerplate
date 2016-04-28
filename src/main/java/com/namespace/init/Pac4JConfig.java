@@ -67,7 +67,7 @@ public class Pac4JConfig {
         HeaderTokenClient headerTokenClient = new HeaderTokenClient("access_token",
                 new TimedJwtAuthenticator(JWT_SIGNING_SECRET, JWT_ENCRYPTION_SECRET));
 
-        return new Config(new Clients("http://localhost:8080/callback",
+        return new Config(new Clients(environment.getRequiredProperty("URL") + "/callback",
                 googleOidcClient, facebookClient, new IndirectBasicAuthClient(passwordAuthenticator),
                 new DirectBasicAuthClient(passwordAuthenticator),
                 headerTokenClient), authorizers);
