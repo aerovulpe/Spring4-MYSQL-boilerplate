@@ -16,6 +16,10 @@
     <a href="login/facebook">Facebook</a>
     <a href="login/oidc">Google OpenID Connect</a>
 
+    <br>
+
+    <%@include  file="/WEB-INF/static/gitkit-signin.html" %>
+
     <footer>
         <p>Vestibulum id ligula porta felis euismod semper.</p>
     </footer>

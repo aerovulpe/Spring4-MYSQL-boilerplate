@@ -15,6 +15,7 @@ import org.pac4j.oauth.client.FacebookClient;
 import org.pac4j.oidc.client.GoogleOidcClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,12 +31,12 @@ public class Pac4JConfig {
     public static final String JWT_SIGNING_SECRET = "12345678901234567890123456789012";
     public static final String JWT_ENCRYPTION_SECRET = "12345678901234567890123456789012";
 
-    private static final short PORT_NUMBER = 8080;
-
     @Autowired
     BCryptUsernamePasswordAuthenticator passwordAuthenticator;
     @Autowired
     RolesPermissionsAuthorizationGenerator rolesPermissionsAuthorizationGenerator;
+    @Autowired
+    Environment environment;
 
     @Bean
     @SuppressWarnings("unchecked")
@@ -66,7 +67,7 @@ public class Pac4JConfig {
         HeaderTokenClient headerTokenClient = new HeaderTokenClient("access_token",
                 new TimedJwtAuthenticator(JWT_SIGNING_SECRET, JWT_ENCRYPTION_SECRET));
 
-        return new Config(new Clients("http://localhost:" + PORT_NUMBER + "/callback",
+        return new Config(new Clients(environment.getRequiredProperty("URL") + "/callback",
                 googleOidcClient, facebookClient, new IndirectBasicAuthClient(passwordAuthenticator),
                 new DirectBasicAuthClient(passwordAuthenticator),
                 headerTokenClient), authorizers);
