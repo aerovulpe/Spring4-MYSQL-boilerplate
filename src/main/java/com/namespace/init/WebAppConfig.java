@@ -88,9 +88,9 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_DRIVER));
-        dataSource.setUrl(environment.getRequiredProperty("CLEARDB_DATABASE_URL"));
-        dataSource.setUsername(environment.getRequiredProperty("CLEARDB_USERNAME"));
-        dataSource.setPassword(environment.getRequiredProperty("CLEARDB_PASSWORD"));
+        dataSource.setUrl(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_URL));
+        dataSource.setUsername(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_USERNAME));
+        dataSource.setPassword(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_PASSWORD));
         return dataSource;
     }
 
