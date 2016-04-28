@@ -4,11 +4,10 @@ import com.google.identitytoolkit.GitkitClient;
 import com.google.identitytoolkit.GitkitUser;
 import com.namespace.init.Pac4JConfig;
 import com.namespace.model.Account;
-import com.namespace.security.HttpProfile;
+import com.namespace.security.GitKitProfile;
 import com.namespace.security.TimedJwtGenerator;
 import com.namespace.service.AccountManager;
 import org.pac4j.core.context.J2EContext;
-import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.ProfileManager;
 import org.slf4j.Logger;
@@ -27,7 +26,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -113,14 +111,13 @@ public class LoginController extends BaseController {
                     + gitkitUser.getLocalId() + "<br> Provider: " + gitkitUser.getCurrentProvider();
             logger.info(userInfo);
 
-            ProfileManager<HttpProfile> httpProfileProfileManager =
+            ProfileManager<GitKitProfile> gitKitProfileProfileManager =
                     new ProfileManager<>(new J2EContext(request, response));
-            Account account = accountManager.getAccountByUsername(gitkitUser.getLocalId());
+            Account account = accountManager.getAccountByUserNaturalId(gitkitUser.getLocalId());
             if (account == null) {
                 logger.info("New account");
                 String[] names = gitkitUser.getName().split(" ");
-                account = new Account(gitkitUser.getLocalId(), null, names[0], names[1], gitkitUser.getEmail(),
-                        new HashSet<>(), new HashSet<>());
+                account = new Account(gitkitUser.getLocalId(), null, names[0], names[1], gitkitUser.getEmail());
                 account.addRole(Account.ROLE_USER);
                 account.addPermission(Account.PERMISSION_ENABLED);
                 account.addPermission(Account.PERMISSION_EMAIL_VERTIFIED);
@@ -128,10 +125,9 @@ public class LoginController extends BaseController {
             }
 
             logger.info("Account: " + account.toString());
-            final HttpProfile profile = new HttpProfile();
-            profile.setId(account.getId());
+            final GitKitProfile profile = new GitKitProfile();
+            profile.setId(account.getNaturalId());
             profile.addAttribute("account_id", account.getId());
-            profile.addAttribute(Pac4jConstants.USERNAME, account.getUsername());
             profile.addAttribute("email", account.getEmail());
             profile.addAttribute("first_name", account.getFirstName());
             profile.addAttribute("family_name", account.getLastName());
@@ -141,12 +137,11 @@ public class LoginController extends BaseController {
             profile.addAttribute("locale", account.getLocale());
             profile.addAttribute("picture_url", account.getPictureUrl());
             profile.addAttribute("location", account.getLocation());
-            profile.addAttribute("ip", request.getRemoteAddr());
             profile.setRemembered(account.isRemembered());
             profile.addRoles(new ArrayList<>(account.getRoles()));
             profile.addPermissions(new ArrayList<>(account.getPermissions()));
 
-            httpProfileProfileManager.save(true, profile, false);
+            gitKitProfileProfileManager.save(true, profile, false);
         }
 
         return "redirect:/";

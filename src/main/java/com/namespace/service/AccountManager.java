@@ -10,9 +10,9 @@ import java.util.List;
 public interface AccountManager {
     boolean updateAccount(Account account);
 
-    Account getEnabledAccount(String username);
+    Account getEnabledAccount(String naturalId);
 
-    Account getAccountByUsername(String username);
+    Account getAccountByUserNaturalId(String naturalId);
 
     Long createNewAccount(Account account) throws Exception;
 
@@ -20,15 +20,15 @@ public interface AccountManager {
 
     List<Account> getDisabledAccounts();
 
-    boolean deactivateAccountByUsername(String username);
+    boolean deactivateAccountByNaturalId(String naturalId);
 
-    Account closeAccount(String username);
+    Account closeAccount(String naturalId);
 
-    Account deleteAccountByUsername(String username);
+    Account deleteAccountByNaturalId(String naturalId);
 
     Account createNewAccount(AccountForm model, BindingResult result) throws Exception;
 
-    Account updateAccount(String username, boolean details, AccountForm model, BindingResult result);
+    Account updateAccount(String naturalId, boolean details, AccountForm model, BindingResult result);
 
     IpAddress seenIpAddress(Account account, String ipAddress) throws Exception;
 }

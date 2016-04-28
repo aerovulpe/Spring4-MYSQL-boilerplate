@@ -97,10 +97,10 @@ public class AccountForm {
         this.passwordConfirmation = passwordConfirmation;
     }
 
-    public AccountForm(@NotNull String username, @NotNull String firstName,
+    public AccountForm(@NotNull String naturalId, @NotNull String firstName,
                        @NotNull String lastName, @NotNull String email, boolean admin,
                        String password, boolean enabled, boolean bannedUser) {
-        this.username = username;
+        this.username = naturalId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -114,7 +114,7 @@ public class AccountForm {
     }
 
     public AccountForm(Account account) {
-        this(account.getUsername(), account.getFirstName(), account.getLastName(), account.getEmail(),
+        this(account.getNaturalId(), account.getFirstName(), account.getLastName(), account.getEmail(),
                 account.hasRole(Account.ROLE_ADMIN), account.getPassword(),
                 account.hasPermission(Account.PERMISSION_ENABLED), account.getRoles().isEmpty());
     }

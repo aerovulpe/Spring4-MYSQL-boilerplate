@@ -12,5 +12,5 @@ public interface AccountDAO extends GenericDAO<Account, Long> {
 
     List<Account> findDisabled();
 
-    Account getAccount(String username);
+    Account getAccount(String naturalId);
 }

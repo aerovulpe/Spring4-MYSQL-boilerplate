@@ -1,6 +1,8 @@
 package com.namespace.util;
 
 import com.namespace.model.Account;
+import com.namespace.security.GitKitProfile;
+import com.namespace.security.HttpProfile;
 import org.pac4j.core.profile.CommonProfile;
 
 import java.util.HashSet;
@@ -12,16 +14,20 @@ public final class Utils {
     private Utils() {
     }
 
-    public static String getUserName(CommonProfile profile) {
-        return profile.getUsername() == null ?
-                profile.getTypedId() : profile.getUsername();
+    public static String getUserNaturalId(CommonProfile profile) {
+        if (profile instanceof HttpProfile)
+            return profile.getUsername();
+        else if (profile instanceof GitKitProfile)
+            return profile.getId();
+        else
+            return profile.getTypedId();
     }
 
     public static Account accountFromProfile(CommonProfile profile) {
         Account account = new Account();
         if (profile.getAttribute("account_id") != null)
             account.setId(profile.getAttribute("account_id", Long.class));
-        account.setUsername(Utils.getUserName(profile));
+        account.setNaturalId(Utils.getUserNaturalId(profile));
         account.setFirstName(profile.getFirstName());
         account.setLastName(profile.getFamilyName());
         account.setEmail(profile.getEmail());

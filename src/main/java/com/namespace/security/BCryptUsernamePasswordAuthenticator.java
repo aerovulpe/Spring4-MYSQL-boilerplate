@@ -46,7 +46,7 @@ public class BCryptUsernamePasswordAuthenticator implements UsernamePasswordAuth
             throwsException("Password cannot be blank");
         }
 
-        Account account = accountManager.getAccountByUsername(username);
+        Account account = accountManager.getAccountByUserNaturalId(username);
         if (account == null) {
             throwsException("Account not found");
         }
