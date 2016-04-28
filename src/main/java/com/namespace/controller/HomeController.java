@@ -97,7 +97,7 @@ public class HomeController extends BaseController {
     public String gitkitSignIn(HttpServletRequest request, HttpServletResponse response) throws Exception {
         GitkitUser gitkitUser;
         GitkitClient gitkitClient = GitkitClient.createFromJson(getClass().getClassLoader()
-                .getResource("gitkit-server-config.json").toURI().getPath());
+                .getResource("gitkit-server-config.json").getPath());
 
 
         gitkitUser = gitkitClient.validateTokenInRequest(request);
