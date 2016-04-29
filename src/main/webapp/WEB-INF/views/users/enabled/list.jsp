@@ -22,12 +22,12 @@
 							<tbody>
 								<c:forEach var="userItem" items="${usersList}">
 									<tr>
-										<td><a href="./updateUser/${userItem.username}/"><c:out value="${userItem.username}"/></a></td>
+										<td><a href="./updateUser/${userItem.naturalId}/"><c:out value="${userItem.naturalId}"/></a></td>
 										<td><c:out value="${userItem.firstName}"/></td>
 										<td><c:out value="${userItem.lastName}"/></td>
 										<td><c:out value="${userItem.email}"/></td>
 										<td>
-											<form:checkbox path="deactivate" value="${userItem.username}"/>
+											<form:checkbox path="deactivate" value="${userItem.naturalId}"/>
 										</td>
 									<tr>
 								</c:forEach>
