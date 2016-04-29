@@ -137,7 +137,7 @@ public class AccountManagerImpl implements AccountManager {
         Account account = accountDAO.getAccount(naturalId);
 
         try {
-            return accountDAO.remove(account) ? account : null;
+            return accountDAO.delete(account) ? account : null;
         } catch (Exception e) {
             return null;
         }
@@ -189,14 +189,14 @@ public class AccountManagerImpl implements AccountManager {
     }
 
     @Override
-    public IpAddress seenIpAddress(Account account, String ipAddress) throws Exception {
-        IpAddress item = ipAddressDAO.ipUsedByAccount(ipAddress, account.getNaturalId());
+    public IpAddress seenIpAddress(String ipAddress) throws Exception {
+        IpAddress item = ipAddressDAO.getIpAddress(ipAddress);
         if (item == null) {
-            item = new IpAddress(account.getNaturalId(), ipAddress);
+            item = new IpAddress(ipAddress);
             ipAddressDAO.create(item);
         } else {
-            item.incrementTimesSeen();
             item.setLastSeen(new Timestamp(System.currentTimeMillis()));
+            item.incrementTimesSeen();
             ipAddressDAO.update(item);
             if (item.isBanned()) {
                 // Uh oh

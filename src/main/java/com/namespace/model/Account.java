@@ -7,7 +7,6 @@ import org.pac4j.core.profile.Gender;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 @Entity
@@ -38,7 +37,7 @@ public class Account {
     private String location;
     private boolean isRemembered;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "roles",
             joinColumns = @JoinColumn(name = "accountId")
@@ -46,7 +45,7 @@ public class Account {
     @Column(name = "role")
     private Set<String> roles;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "permissions",
             joinColumns = @JoinColumn(name = "accountId")
@@ -54,10 +53,6 @@ public class Account {
     @Column(name = "permission")
     private Set<String> permissions;
 
-    @JoinColumn(name = "accountNaturalId")
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @MapKey(name = "ipAddress")
-    private Map<String, IpAddress> ipAddresses;
 
     public Long getId() {
         return id;
@@ -164,14 +159,6 @@ public class Account {
         isRemembered = remembered;
     }
 
-    public Map<String, IpAddress> getIpAddresses() {
-        return ipAddresses;
-    }
-
-    public void setIpAddresses(Map<String, IpAddress> ipAddresses) {
-        this.ipAddresses = ipAddresses;
-    }
-
     public void addRole(String role) {
         roles.add(role);
     }
@@ -194,10 +181,6 @@ public class Account {
 
     public boolean hasPermission(String permission) {
         return permissions.contains(permission);
-    }
-
-    public boolean hasPreviouslySeenIp(IpAddress ipAddress) {
-        return ipAddresses.containsKey(ipAddress.getIpAddress());
     }
 
     public Account(@NotNull String naturalId, String password, @NotNull String firstName, @NotNull String lastName,
@@ -231,7 +214,6 @@ public class Account {
                 ", isRemembered=" + isRemembered +
                 ", roles=" + roles +
                 ", permissions=" + permissions +
-                ", ipAddresses=" + ipAddresses +
                 '}';
     }
 

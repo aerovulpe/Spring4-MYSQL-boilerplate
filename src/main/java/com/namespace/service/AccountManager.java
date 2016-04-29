@@ -30,5 +30,5 @@ public interface AccountManager {
 
     Account updateAccount(String naturalId, boolean details, AccountForm model, BindingResult result);
 
-    IpAddress seenIpAddress(Account account, String ipAddress) throws Exception;
+    IpAddress seenIpAddress(String ipAddress) throws Exception;
 }

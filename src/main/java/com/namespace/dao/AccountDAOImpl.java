@@ -47,12 +47,9 @@ public class AccountDAOImpl extends SessionDAO<Account, Long> implements Account
     @Override
     public Account getAccount(String naturalId) {
         try {
-            Account account = getCurrentSession().bySimpleNaturalId(Account.class).load(naturalId);
+            logger.info("retrieving this account from the database: " + naturalId);
 
-            logger.info("retrieving this account from the database: " + account.toString());
-
-            return account;
-
+            return getCurrentSession().bySimpleNaturalId(Account.class).load(naturalId);
         } catch (Exception e) {
             logger.info("cannot retrieve " + naturalId + "'s account from the database.");
             return null;
@@ -65,6 +62,11 @@ public class AccountDAOImpl extends SessionDAO<Account, Long> implements Account
         if (account.getPassword() != null)
             account.setPassword(getHashPassword(account.getPassword()));
         return (Long) getCurrentSession().save(account);
+    }
+
+    @Override
+    public Account retrieve(Long id) throws Exception {
+        return getCurrentSession().get(Account.class, id);
     }
 
     @Override
@@ -102,7 +104,7 @@ public class AccountDAOImpl extends SessionDAO<Account, Long> implements Account
     }
 
     @Override
-    public boolean remove(Account account) {
+    public boolean delete(Account account) {
         Account accountToDelete = getAccount(account.getNaturalId());
         if (accountToDelete == null) {
             logger.info("This account doesn't exist at the database or " +

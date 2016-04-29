@@ -1,5 +1,7 @@
 package com.namespace.model;
 
+import org.hibernate.annotations.NaturalId;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 
@@ -12,7 +14,8 @@ public class IpAddress {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private String accountNaturalId;
+
+    @NaturalId
     private String ipAddress;
     private boolean banned;
     private int timesSeen;
@@ -22,8 +25,7 @@ public class IpAddress {
     public IpAddress() {
     }
 
-    public IpAddress(String accountNaturalId, String ipAddress, boolean banned) {
-        this.accountNaturalId = accountNaturalId;
+    public IpAddress(String ipAddress, boolean banned) {
         this.ipAddress = ipAddress;
         this.banned = banned;
         Timestamp firstSeen = new Timestamp(System.currentTimeMillis());
@@ -32,8 +34,8 @@ public class IpAddress {
         incrementTimesSeen();
     }
 
-    public IpAddress(String accountNaturalId, String ipAddress) {
-        this(accountNaturalId, ipAddress, false);
+    public IpAddress(String ipAddress) {
+        this(ipAddress, false);
     }
 
     public Integer getId() {
@@ -42,14 +44,6 @@ public class IpAddress {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getAccountNaturalId() {
-        return accountNaturalId;
-    }
-
-    public void setAccountNaturalId(String accountNaturalId) {
-        this.accountNaturalId = accountNaturalId;
     }
 
     public String getIpAddress() {
@@ -100,7 +94,6 @@ public class IpAddress {
     public String toString() {
         return "IpAddress{" +
                 "id=" + id +
-                ", accountNaturalId='" + accountNaturalId + '\'' +
                 ", ipAddress='" + ipAddress + '\'' +
                 ", banned=" + banned +
                 ", timesSeen=" + timesSeen +
@@ -116,15 +109,23 @@ public class IpAddress {
 
         IpAddress ipAddress1 = (IpAddress) o;
 
-        if (!getAccountNaturalId().equals(ipAddress1.getAccountNaturalId())) return false;
-        return getIpAddress().equals(ipAddress1.getIpAddress());
+        if (isBanned() != ipAddress1.isBanned()) return false;
+        if (getTimesSeen() != ipAddress1.getTimesSeen()) return false;
+        if (!getId().equals(ipAddress1.getId())) return false;
+        if (!getIpAddress().equals(ipAddress1.getIpAddress())) return false;
+        if (!getFirstSeen().equals(ipAddress1.getFirstSeen())) return false;
+        return getLastSeen().equals(ipAddress1.getLastSeen());
 
     }
 
     @Override
     public int hashCode() {
-        int result = getAccountNaturalId().hashCode();
+        int result = getId().hashCode();
         result = 31 * result + getIpAddress().hashCode();
+        result = 31 * result + (isBanned() ? 1 : 0);
+        result = 31 * result + getTimesSeen();
+        result = 31 * result + getFirstSeen().hashCode();
+        result = 31 * result + getLastSeen().hashCode();
         return result;
     }
 }
