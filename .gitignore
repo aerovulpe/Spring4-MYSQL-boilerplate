@@ -1,3 +1,5 @@
+/src/main/resources/gitkit-server-config.json
+/src/main/resources/spring-boilerplate.json
 /Spring4-boilerplate.iml
 target/
 .idea/
