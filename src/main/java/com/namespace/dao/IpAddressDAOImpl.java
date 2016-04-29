@@ -30,7 +30,7 @@ public class IpAddressDAOImpl extends SessionDAO<IpAddress, Integer> implements 
     @Override
     public IpAddress ipUsedByAccount(String ipAddress, String naturalId) {
         Query query = getCurrentSession()
-                .createQuery("select ip from IpAddress ip where ip.ipAddress = :ipAddress AND ip.userNaturalId = :userNaturalId")
+                .createQuery("select ip from IpAddress ip where ip.ipAddress = :ipAddress AND ip.accountNaturalId = :userNaturalId")
                 .setParameter("ipAddress", ipAddress)
                 .setParameter("userNaturalId", naturalId);
         return (IpAddress) query.uniqueResult();

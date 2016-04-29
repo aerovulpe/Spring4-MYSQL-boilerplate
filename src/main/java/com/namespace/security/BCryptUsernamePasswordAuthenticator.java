@@ -58,7 +58,8 @@ public class BCryptUsernamePasswordAuthenticator implements UsernamePasswordAuth
         }
 
         final HttpProfile profile = new HttpProfile();
-        String ipAddress = request.getRemoteAddr();
+        String forwardAddress = request.getHeader("X-FORWARDED-FOR");
+        String ipAddress = forwardAddress == null ? request.getRemoteAddr() : forwardAddress;
 
         try {
             accountManager.seenIpAddress(account, ipAddress);

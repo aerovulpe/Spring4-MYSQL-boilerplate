@@ -12,7 +12,7 @@ public class IpAddress {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private String userNaturalId;
+    private String accountNaturalId;
     private String ipAddress;
     private boolean banned;
     private int timesSeen;
@@ -22,8 +22,8 @@ public class IpAddress {
     public IpAddress() {
     }
 
-    public IpAddress(String userNaturalId, String ipAddress, boolean banned) {
-        this.userNaturalId = userNaturalId;
+    public IpAddress(String accountNaturalId, String ipAddress, boolean banned) {
+        this.accountNaturalId = accountNaturalId;
         this.ipAddress = ipAddress;
         this.banned = banned;
         Timestamp firstSeen = new Timestamp(System.currentTimeMillis());
@@ -32,8 +32,8 @@ public class IpAddress {
         incrementTimesSeen();
     }
 
-    public IpAddress(String userNaturalId, String ipAddress) {
-        this(userNaturalId, ipAddress, false);
+    public IpAddress(String accountNaturalId, String ipAddress) {
+        this(accountNaturalId, ipAddress, false);
     }
 
     public Integer getId() {
@@ -44,12 +44,12 @@ public class IpAddress {
         this.id = id;
     }
 
-    public String getUserNaturalId() {
-        return userNaturalId;
+    public String getAccountNaturalId() {
+        return accountNaturalId;
     }
 
-    public void setUserNaturalId(String userNaturalId) {
-        this.userNaturalId = userNaturalId;
+    public void setAccountNaturalId(String accountNaturalId) {
+        this.accountNaturalId = accountNaturalId;
     }
 
     public String getIpAddress() {
@@ -100,7 +100,7 @@ public class IpAddress {
     public String toString() {
         return "IpAddress{" +
                 "id=" + id +
-                ", userNaturalId='" + userNaturalId + '\'' +
+                ", accountNaturalId='" + accountNaturalId + '\'' +
                 ", ipAddress='" + ipAddress + '\'' +
                 ", banned=" + banned +
                 ", timesSeen=" + timesSeen +
@@ -116,14 +116,14 @@ public class IpAddress {
 
         IpAddress ipAddress1 = (IpAddress) o;
 
-        if (!getUserNaturalId().equals(ipAddress1.getUserNaturalId())) return false;
+        if (!getAccountNaturalId().equals(ipAddress1.getAccountNaturalId())) return false;
         return getIpAddress().equals(ipAddress1.getIpAddress());
 
     }
 
     @Override
     public int hashCode() {
-        int result = getUserNaturalId().hashCode();
+        int result = getAccountNaturalId().hashCode();
         result = 31 * result + getIpAddress().hashCode();
         return result;
     }
