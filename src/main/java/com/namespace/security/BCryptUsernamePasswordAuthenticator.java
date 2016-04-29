@@ -62,7 +62,7 @@ public class BCryptUsernamePasswordAuthenticator implements UsernamePasswordAuth
         String ipAddress = forwardAddress == null ? request.getRemoteAddr() : forwardAddress;
 
         try {
-            accountManager.seenIpAddress(account, ipAddress);
+            accountManager.seenIpAddress(ipAddress);
         } catch (BannedIpException e) {
             throw e;
         } catch (Exception e) {
