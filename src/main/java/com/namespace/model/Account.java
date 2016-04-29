@@ -41,7 +41,7 @@ public class Account {
     @ElementCollection
     @CollectionTable(
             name = "roles",
-            joinColumns = @JoinColumn(name = "userNaturalId")
+            joinColumns = @JoinColumn(name = "accountId")
     )
     @Column(name = "role")
     private Set<String> roles;
@@ -49,12 +49,12 @@ public class Account {
     @ElementCollection
     @CollectionTable(
             name = "permissions",
-            joinColumns = @JoinColumn(name = "userNaturalId")
+            joinColumns = @JoinColumn(name = "accountId")
     )
     @Column(name = "permission")
     private Set<String> permissions;
 
-    @JoinColumn(name = "userNaturalId")
+    @JoinColumn(name = "accountNaturalId")
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @MapKey(name = "ipAddress")
     private Map<String, IpAddress> ipAddresses;
