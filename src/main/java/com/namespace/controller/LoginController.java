@@ -13,6 +13,7 @@ import org.pac4j.core.profile.ProfileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -42,6 +44,8 @@ public class LoginController extends BaseController {
     ServletContext servletContext;
     @Autowired
     AccountManager accountManager;
+    @Autowired
+    Environment environment;
 
     public LoginController() {
     }
@@ -100,8 +104,14 @@ public class LoginController extends BaseController {
     @RequestMapping("/gitkit/success")
     public String gitkitSignIn(HttpServletRequest request, HttpServletResponse response) throws Exception {
         GitkitUser gitkitUser;
-        GitkitClient gitkitClient = GitkitClient.createFromJson(getClass().getClassLoader()
-                .getResource("gitkit-server-config.json").getPath());
+        GitkitClient gitkitClient = new GitkitClient.Builder()
+                .setGoogleClientId(environment.getProperty("clientId"))
+                .setProjectId(environment.getProperty("projectId"))
+                .setServiceAccountEmail(environment.getProperty("serviceAccountEmail"))
+                .setKeyStream(new FileInputStream(environment.getProperty("serviceAccountPrivateKeyFile")))
+                .setWidgetUrl(environment.getProperty("widgetUrl"))
+                .setCookieName(environment.getProperty("cookieName"))
+                .build();
 
 
         gitkitUser = gitkitClient.validateTokenInRequest(request);
