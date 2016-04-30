@@ -8,4 +8,19 @@
     <display-name>Spring-boilerplate</display-name>
 
     <description>Spring 4 integration example</description>
+
+    <error-page>
+        <error-code>401</error-code>
+        <location>/WEB-INF/errors/error401.jsp</location>
+    </error-page>
+
+    <error-page>
+        <error-code>403</error-code>
+        <location>/WEB-INF/errors/error403.jsp</location>
+    </error-page>
+
+    <error-page>
+        <error-code>500</error-code>
+        <location>/WEB-INF/errors/error500.jsp</location>
+    </error-page>
 </web-app>
