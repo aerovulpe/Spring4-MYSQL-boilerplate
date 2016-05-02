@@ -1,10 +1,7 @@
 package com.namespace.service;
 
 import com.namespace.dao.AccountDAO;
-import com.namespace.dao.IpAddressDAO;
 import com.namespace.model.Account;
-import com.namespace.model.IpAddress;
-import com.namespace.security.BannedIpException;
 import com.namespace.service.dto.AccountForm;
 import com.namespace.service.dto.AccountFormAssembler;
 import com.namespace.service.validator.AccountCreationValidator;
@@ -17,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 @Service
@@ -28,8 +24,6 @@ public class AccountManagerImpl implements AccountManager {
 
     @Autowired
     private AccountDAO accountDAO;
-    @Autowired
-    private IpAddressDAO ipAddressDAO;
     @Autowired
     private AccountCreationValidator accountCreationValidator;
     @Autowired
@@ -186,24 +180,5 @@ public class AccountManagerImpl implements AccountManager {
 
         updateAccount(account);
         return account;
-    }
-
-    @Override
-    public IpAddress seenIpAddress(String ipAddress) throws Exception {
-        IpAddress item = ipAddressDAO.getIpAddress(ipAddress);
-        if (item == null) {
-            item = new IpAddress(ipAddress);
-            ipAddressDAO.create(item);
-        } else {
-            item.setLastSeen(new Timestamp(System.currentTimeMillis()));
-            item.incrementTimesSeen();
-            ipAddressDAO.update(item);
-            if (item.isBanned()) {
-                // Uh oh
-                throw new BannedIpException();
-            }
-        }
-
-        return item;
     }
 }

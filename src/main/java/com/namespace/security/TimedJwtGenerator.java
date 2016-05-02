@@ -13,6 +13,7 @@ import org.pac4j.jwt.profile.JwtGenerator;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -20,38 +21,32 @@ import java.util.Map;
  */
 public class TimedJwtGenerator<U extends CommonProfile> extends JwtGenerator<U> {
 
-    public static final int LONG_ACCESS_TOKEN_TIME = 60;
-
-    public TimedJwtGenerator(String secret) {
-        super(secret);
-    }
-
-    public TimedJwtGenerator(String secret, boolean encrypted) {
-        super(secret, encrypted);
-    }
+    public static final int LONG_ACCESS_TOKEN_TIME = 500;
 
     public TimedJwtGenerator(String signingSecret, String encryptionSecret) {
         super(signingSecret, encryptionSecret);
     }
 
     @Override
+    @Deprecated
     public String generate(U profile) {
-        return generate(profile, LONG_ACCESS_TOKEN_TIME);
+        return super.generate(profile);
     }
 
-    public String generate(U profile, int numOfDays) {
+    public Map<String, String> generateToken(U profile) {
+        return generateToken(profile, LONG_ACCESS_TOKEN_TIME);
+    }
+
+    public Map<String, String> generateToken(U profile, int numOfDays) {
+        Map<String, String> map = new HashMap<>();
+
         CommonHelper.assertNotNull("profile", profile);
-        // CommonHelper.assertNull("profile.sub", profile.getAttribute(JwtConstants.SUBJECT));
+        CommonHelper.assertNull("profile.sub", profile.getAttribute(JwtConstants.SUBJECT));
         CommonHelper.assertNull("profile.iat", profile.getAttribute(JwtConstants.ISSUE_TIME));
         CommonHelper.assertNull(INTERNAL_ROLES, profile.getAttribute(INTERNAL_ROLES));
         CommonHelper.assertNull(INTERNAL_PERMISSIONS, profile.getAttribute(INTERNAL_PERMISSIONS));
         CommonHelper.assertNotBlank("signingSecret", getSigningSecret());
         CommonHelper.assertNotNull("jwsAlgorithm", getJwsAlgorithm());
-
-        // Hack for GoogleOidcProfile
-        if (profile.getAttribute(JwtConstants.SUBJECT) != null) {
-            profile.addAttribute(JwtConstants.SUBJECT, profile.getTypedId());
-        }
 
         try {
             // Create HMAC signer
@@ -62,6 +57,9 @@ public class TimedJwtGenerator<U extends CommonProfile> extends JwtGenerator<U> 
             cal.setTime(issueDate);
             cal.add(Calendar.DATE, numOfDays); // add days
             Date expirationDate = cal.getTime();
+
+            map.put("issue_time", issueDate.toString());
+            map.put("expire_time", expirationDate.toString());
 
             // Build claims
             final JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder()
@@ -99,12 +97,14 @@ public class TimedJwtGenerator<U extends CommonProfile> extends JwtGenerator<U> 
                 jweObject.encrypt(new DirectEncrypter(getEncryptionSecret().getBytes("UTF-8")));
 
                 // Serialise to JWE compact form
-                return jweObject.serialize();
+                map.put("access_token", jweObject.serialize());
             }
-            return signedJWT.serialize();
+            map.put("access_token", signedJWT.serialize());
 
         } catch (final Exception e) {
             throw new TechnicalException("Cannot generate JWT", e);
         }
+
+        return map;
     }
 }

@@ -1,7 +1,6 @@
 package com.namespace.service;
 
 import com.namespace.model.Account;
-import com.namespace.model.IpAddress;
 import com.namespace.service.dto.AccountForm;
 import org.springframework.validation.BindingResult;
 
@@ -29,6 +28,4 @@ public interface AccountManager {
     Account createNewAccount(AccountForm model, BindingResult result) throws Exception;
 
     Account updateAccount(String naturalId, boolean details, AccountForm model, BindingResult result);
-
-    IpAddress seenIpAddress(String ipAddress) throws Exception;
 }

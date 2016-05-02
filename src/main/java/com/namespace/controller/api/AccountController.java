@@ -1,4 +1,4 @@
-package com.namespace.controller.rest;
+package com.namespace.controller.api;
 
 import com.namespace.controller.BaseController;
 import com.namespace.model.Account;
@@ -17,10 +17,10 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  * Created by Aaron on 10/04/2016.
  */
 @RestController
-public class RESTAccountController extends BaseController {
-    private static final Logger logger = LoggerFactory.getLogger(RESTAccountController.class);
+public class AccountController extends BaseController {
+    private static final Logger logger = LoggerFactory.getLogger(AccountController.class);
 
-    public RESTAccountController() {
+    public AccountController() {
     }
 
     @RequestMapping(value = "/api/account", method = GET)

@@ -2,11 +2,10 @@ package com.namespace.controller;
 
 import com.google.identitytoolkit.GitkitClient;
 import com.google.identitytoolkit.GitkitUser;
-import com.namespace.init.Pac4JConfig;
 import com.namespace.model.Account;
 import com.namespace.security.GitKitProfile;
-import com.namespace.security.TimedJwtGenerator;
 import com.namespace.service.AccountManager;
+import com.namespace.util.Utils;
 import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.ProfileManager;
@@ -14,11 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -26,7 +24,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Scanner;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -39,62 +36,26 @@ public class LoginController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
     @Autowired
-    ServletContext servletContext;
-    @Autowired
     AccountManager accountManager;
 
     public LoginController() {
     }
 
     @RequestMapping(value = "/", method = GET)
-    public String home(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
+    public void home(HttpServletRequest request, HttpServletResponse response) {
         CommonProfile profile = getProfile(request, response);
-        if (profile != null)
-            logger.info("Welcome home, " + profile.getFirstName() + "!");
-        map.put("profile", profile);
-        return "/home/home";
-    }
-
-    @RequestMapping(value = "/loginfailed", method = GET)
-    public String loginError(ModelMap model) {
-        model.addAttribute("error", "true");
-        return "/signin/signin";
-    }
-
-    @RequestMapping(value = "/login", method = GET)
-    public String getLoginPage() {
-        return "/signin/signin";
-    }
-
-    @RequestMapping("/login/facebook")
-    public String facebook(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
-        map.put("profile", getProfile(request, response));
-        return "redirect:/";
-    }
-
-    @RequestMapping("/login/iba")
-    public String form(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
-        map.put("profile", getProfile(request, response));
-        return "redirect:/";
-    }
-
-    @RequestMapping("/login/oidc")
-    public String oidc(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
-        map.put("profile", getProfile(request, response));
-        return "redirect:/";
-    }
-
-    @RequestMapping(value = "/jwt.html", method = GET)
-    public String jwt(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
-        final CommonProfile profile = getProfile(request, response);
-        final TimedJwtGenerator<CommonProfile> generator = new TimedJwtGenerator<>(Pac4JConfig.JWT_SIGNING_SECRET,
-                Pac4JConfig.JWT_ENCRYPTION_SECRET);
-        String token = "";
         if (profile != null) {
-            token = generator.generate(profile);
+            if (profile.getRoles().contains(Account.ROLE_ADMIN)) {
+                logger.info("Welcome home admin, " + profile.getFirstName() + "!");
+                serveHtmlPage("static/admin/index.html", response);
+            } else {
+                logger.info("Welcome home user, " + profile.getFirstName() + "!");
+                serveHtmlPage("static/user/index.html", response);
+            }
+        } else {
+            logger.info("not logged in!");
+            serveHtmlPage("static/landing.html", response);
         }
-        map.put("token", token);
-        return "/jwt";
     }
 
     @RequestMapping("/gitkit/success")
@@ -142,6 +103,8 @@ public class LoginController extends BaseController {
             profile.addPermissions(new ArrayList<>(account.getPermissions()));
 
             gitKitProfileProfileManager.save(true, profile, false);
+
+            response.addCookie(new Cookie("access_token", Utils.getAccessToken(profile).get("access_token")));
         }
 
         return "redirect:/";
@@ -150,6 +113,10 @@ public class LoginController extends BaseController {
     @RequestMapping("/oauth2callback")
     public void gitkitWidget(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        returnGitkitWidget("static/gitkit-widget.html", request, response);
+    }
+
+    private void returnGitkitWidget(String path, HttpServletRequest request, HttpServletResponse response) {
         response.setContentType("text/html");
 
         StringBuilder builder = new StringBuilder();
@@ -158,21 +125,18 @@ public class LoginController extends BaseController {
             while ((line = request.getReader().readLine()) != null) {
                 builder.append(line);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        String postBody = URLEncoder.encode(builder.toString(), "UTF-8");
-
-        try {
+            String postBody = URLEncoder.encode(builder.toString(), "UTF-8");
             response.getWriter().print(new Scanner(new File(servletContext
-                    .getRealPath("/WEB-INF/static/gitkit-widget.html")), "UTF-8")
+                    .getRealPath(path)), "UTF-8")
                     .useDelimiter("\\A").next()
                     .replaceAll("JAVASCRIPT_ESCAPED_POST_BODY", postBody));
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            response.getWriter().print(e.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 }
