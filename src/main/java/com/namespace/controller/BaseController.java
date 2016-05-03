@@ -41,8 +41,9 @@ public abstract class BaseController {
         }
 
         GitkitUser gitkitUser = GitKitIdentity.getUser(request);
-        if (gitkitUser != null && GitKitIdentity.userHasVerifiedEmail(request)) {
-            GitKitProfile gitKitProfile = GitKitIdentity.gitKitProfileFromUser(accountManager, gitkitUser, true);
+        if (gitkitUser != null) {
+            GitKitProfile gitKitProfile = GitKitIdentity.gitKitProfileFromUser(accountManager, gitkitUser,
+                    GitKitIdentity.userHasVerifiedEmail(request));
             if (gitKitProfile != null) {
                 manager.save(true, gitKitProfile, false);
             }

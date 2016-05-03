@@ -146,8 +146,8 @@ public class GitKitIdentity {
                             " when you click this confirmation link:\n\n " + oobResponse.getOobUrl().get() +
                             "\n\nIf you didn't request an email address change for this account, please disregard this message.");
                 } else if (oobResponse.getOobAction().equals(GitkitClient.OobAction.RESET_PASSWORD)) {
-                    msg.setSubject("Password change for Campfire account");
-                    msg.setText("Hello!\n\n The password for your Campfire account will be reset " +
+                    msg.setSubject("Password change for Spring Boilerplate account");
+                    msg.setText("Hello!\n\n The password for your Spring Boilerplate account will be reset " +
                             "when you click this confirmation link:\n\n " + oobResponse.getOobUrl().get() +
                             "\n\nIf you didn't request a password change for this account, please disregard this message.");
                 }

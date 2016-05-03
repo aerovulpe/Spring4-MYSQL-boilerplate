@@ -26,7 +26,6 @@ public class AccountController extends BaseController {
 
     @RequestMapping(value = "/me", method = GET)
     public Account getAccount(HttpServletRequest request, HttpServletResponse response) {
-        Account account = Utils.accountFromProfile(getProfile(request, response));
-        return account;
+        return Utils.accountFromProfile(getProfile(request, response));
     }
 }
