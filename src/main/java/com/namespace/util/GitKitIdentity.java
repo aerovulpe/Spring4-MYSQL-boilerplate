@@ -163,7 +163,7 @@ public class GitKitIdentity {
     }
 
     public static GitKitProfile gitKitProfileFromUser(AccountManager accountManager, GitkitUser gitkitUser,
-                                                      boolean isVerified) {
+                                                      boolean isVerified, boolean updateAccount) {
         boolean newAccount = false;
         Account account = accountManager.getAccountByNaturalId(gitkitUser.getLocalId());
         if (account == null) {
@@ -185,7 +185,7 @@ public class GitKitIdentity {
         try {
             if (newAccount) {
                 accountManager.createNewAccount(account);
-            } else {
+            } else if (updateAccount) {
                 accountManager.updateAccount(account);
             }
         } catch (Exception e) {

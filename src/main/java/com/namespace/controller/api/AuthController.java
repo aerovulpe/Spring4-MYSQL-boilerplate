@@ -24,7 +24,7 @@ public class AuthController extends BaseController {
     public Map jwt(@RequestParam("gtoken") String gtoken, HttpServletResponse response) throws Exception {
 
         CommonProfile profile = GitKitIdentity.gitKitProfileFromUser(accountManager, GitKitIdentity.getUser(gtoken),
-                GitKitIdentity.userHasVerifiedEmail(gtoken));
+                GitKitIdentity.userHasVerifiedEmail(gtoken), true);
         if (profile == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }

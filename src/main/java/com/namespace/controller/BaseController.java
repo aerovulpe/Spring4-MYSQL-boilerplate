@@ -30,7 +30,6 @@ public abstract class BaseController {
     @Autowired
     protected AccountManager accountManager;
 
-    @SuppressWarnings("unchecked")
     protected CommonProfile getProfile(HttpServletRequest request, HttpServletResponse response) {
         final WebContext context = new J2EContext(request, response);
         final ProfileManager<CommonProfile> manager = new ProfileManager<>(context);
@@ -43,7 +42,7 @@ public abstract class BaseController {
         GitkitUser gitkitUser = GitKitIdentity.getUser(request);
         if (gitkitUser != null) {
             GitKitProfile gitKitProfile = GitKitIdentity.gitKitProfileFromUser(accountManager, gitkitUser,
-                    GitKitIdentity.userHasVerifiedEmail(request));
+                    GitKitIdentity.userHasVerifiedEmail(request), false);
             if (gitKitProfile != null) {
                 manager.save(true, gitKitProfile, false);
             }
@@ -72,6 +71,4 @@ public abstract class BaseController {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
-
-
 }
