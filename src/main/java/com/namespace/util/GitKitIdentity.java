@@ -71,6 +71,10 @@ public class GitKitIdentity {
 
     private static String getAuthTokenFromRequest(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return null;
+        }
+
         for (Cookie cookie : cookies) {
             if ("gtoken".equals(cookie.getName())) {
                 return cookie.getValue();
