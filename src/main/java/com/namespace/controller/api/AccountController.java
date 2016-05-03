@@ -17,16 +17,16 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  * Created by Aaron on 10/04/2016.
  */
 @RestController
+@RequestMapping("/api/accounts")
 public class AccountController extends BaseController {
     private static final Logger logger = LoggerFactory.getLogger(AccountController.class);
 
     public AccountController() {
     }
 
-    @RequestMapping(value = "/api/account", method = GET)
+    @RequestMapping(value = "/me", method = GET)
     public Account getAccount(HttpServletRequest request, HttpServletResponse response) {
         Account account = Utils.accountFromProfile(getProfile(request, response));
-        logger.info("Happy resting, " + account.getFirstName());
         return account;
     }
 }

@@ -62,7 +62,7 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new LocaleChangeInterceptor());
         registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "HeaderTokenClient", "user"))
-                .addPathPatterns("/api/account/**");
+                .addPathPatterns("/api/accounts/**");
     }
 
     @Bean

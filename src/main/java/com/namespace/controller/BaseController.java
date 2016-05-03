@@ -1,5 +1,9 @@
 package com.namespace.controller;
 
+import com.google.identitytoolkit.GitkitUser;
+import com.namespace.security.GitKitProfile;
+import com.namespace.service.AccountManager;
+import com.namespace.util.GitKitIdentity;
 import com.namespace.util.Utils;
 import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.context.WebContext;
@@ -22,14 +26,30 @@ import java.util.Scanner;
 public abstract class BaseController {
 
     @Autowired
-    ServletContext servletContext;
+    protected ServletContext servletContext;
+    @Autowired
+    protected AccountManager accountManager;
 
     @SuppressWarnings("unchecked")
     protected CommonProfile getProfile(HttpServletRequest request, HttpServletResponse response) {
         final WebContext context = new J2EContext(request, response);
         final ProfileManager<CommonProfile> manager = new ProfileManager<>(context);
         Optional<CommonProfile> profile = manager.get(true);
-        return profile.isPresent() ? profile.get() : null;
+
+        if (profile.isPresent()) {
+            return profile.get();
+        }
+
+        GitkitUser gitkitUser = GitKitIdentity.getUser(request);
+        if (gitkitUser != null && GitKitIdentity.userHasVerifiedEmail(request)) {
+            GitKitProfile gitKitProfile = GitKitIdentity.gitKitProfileFromUser(accountManager, gitkitUser, true);
+            if (gitKitProfile != null) {
+                manager.save(true, gitKitProfile, false);
+            }
+            return gitKitProfile;
+        }
+
+        return null;
     }
 
     protected String getUserNaturalId(HttpServletRequest request, HttpServletResponse response) {
@@ -51,4 +71,6 @@ public abstract class BaseController {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
+
+
 }

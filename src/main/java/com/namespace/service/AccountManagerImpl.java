@@ -95,8 +95,6 @@ public class AccountManagerImpl implements AccountManager {
 
         try {
             logger.info("Trying to create a new account: " + account.toString());
-            account.addRole(Account.ROLE_USER);
-            account.addPermission(Account.PERMISSION_ENABLED);
             return this.accountDAO.create(account);
         } catch (Exception e) {
             logger.error(e.toString());
