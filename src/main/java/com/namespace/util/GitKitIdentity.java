@@ -48,7 +48,7 @@ public class GitKitIdentity {
 
     private static GitkitClient getGitkitClient() throws IOException, GitkitClientException {
         return GitkitClient.createFromJson(GitKitIdentity.class.getClassLoader()
-                .getResource("gitkit-server-config.json").getPath().substring(1));
+                .getResource("gitkit-server-config.json").getPath());
     }
 
     public static boolean userHasVerifiedEmail(HttpServletRequest request) {
