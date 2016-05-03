@@ -28,7 +28,7 @@ import java.util.Properties;
  */
 @Configuration
 @ComponentScan({"com.namespace"})
-@Import({Pac4JConfig.class, ViewConfig.class})
+@Import({Pac4JConfig.class})
 @EnableWebMvc
 @EnableTransactionManagement
 @PropertySource("classpath:application.properties")
@@ -55,21 +55,14 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addResourceHandlers(final ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/assets/**").addResourceLocations("/assets/");
+        registry.addResourceHandler("/static/**").addResourceLocations("/static/");
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new LocaleChangeInterceptor());
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "GoogleOidcClient", "user"))
-                .addPathPatterns("/login/oidc");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "FacebookClient", "user"))
-                .addPathPatterns("/login/facebook");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "IndirectBasicAuthClient", "user"))
-                .addPathPatterns("/login/iba");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "DirectBasicAuthClient", "user"))
-                .addPathPatterns("/jwt/dba");
         registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "HeaderTokenClient", "user"))
-                .addPathPatterns("/api/account");
+                .addPathPatterns("/api/accounts/**");
     }
 
     @Bean
