@@ -1,10 +1,9 @@
 package com.namespace.controller;
 
-import com.google.identitytoolkit.GitkitUser;
+import com.namespace.model.Account;
 import com.namespace.security.GitKitProfile;
 import com.namespace.service.AccountManager;
 import com.namespace.util.GitKitIdentity;
-import com.namespace.util.Utils;
 import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.profile.CommonProfile;
@@ -17,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -30,7 +30,6 @@ public abstract class BaseController {
     @Autowired
     protected AccountManager accountManager;
 
-    @SuppressWarnings("unchecked")
     protected CommonProfile getProfile(HttpServletRequest request, HttpServletResponse response) {
         final WebContext context = new J2EContext(request, response);
         final ProfileManager<CommonProfile> manager = new ProfileManager<>(context);
@@ -40,24 +39,38 @@ public abstract class BaseController {
             return profile.get();
         }
 
-        GitkitUser gitkitUser = GitKitIdentity.getUser(request);
-        if (gitkitUser != null) {
-            GitKitProfile gitKitProfile = GitKitIdentity.gitKitProfileFromUser(accountManager, gitkitUser,
-                    GitKitIdentity.userHasVerifiedEmail(request));
-            if (gitKitProfile != null) {
-                manager.save(true, gitKitProfile, false);
-            }
-            return gitKitProfile;
+        // Fallback
+        GitKitProfile gitKitProfile = GitKitIdentity.getGitKitProfile(accountManager, request, false);
+        if (gitKitProfile != null) {
+            manager.save(true, gitKitProfile, false);
         }
 
-        return null;
+        return gitKitProfile;
     }
 
-    protected String getUserNaturalId(HttpServletRequest request, HttpServletResponse response) {
-        return Utils.getUserNaturalId(getProfile(request, response));
+    protected Account accountFromProfile(CommonProfile profile) {
+        Account account = new Account();
+        if (profile.getAttribute("account_id") != null)
+            account.setId(profile.getAttribute("account_id", Long.class));
+        account.setNaturalId(getUserNaturalId(profile));
+        account.setFirstName(profile.getFirstName());
+        account.setLastName(profile.getFamilyName());
+        account.setEmail(profile.getEmail());
+        account.setPictureUrl(profile.getPictureUrl());
+        account.setGender(profile.getGender());
+        account.setLocale(profile.getLocale() == null ? null : profile.getLocale().toLanguageTag());
+        account.setLocation(profile.getLocation());
+        account.setRemembered(profile.isRemembered());
+        account.setRoles(new HashSet<>(profile.getRoles()));
+        account.setPermissions(new HashSet<>(profile.getPermissions()));
+        return account;
     }
 
-    protected void serveHtmlPage(String path, HttpServletResponse response) {
+    private static String getUserNaturalId(CommonProfile profile) {
+        return profile.getId();
+    }
+
+    void serveHtmlPage(String path, HttpServletResponse response) {
         response.setContentType("text/html");
         try {
             response.getWriter().print(new Scanner(new File(servletContext
@@ -72,6 +85,4 @@ public abstract class BaseController {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
-
-
 }
