@@ -10,7 +10,6 @@ import com.google.identitytoolkit.GitkitUser;
 import com.namespace.model.Account;
 import com.namespace.security.GitKitProfile;
 import com.namespace.service.AccountManager;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
 import javax.mail.Message;
@@ -38,12 +37,14 @@ import java.util.Scanner;
  * Created by Aaron on 03/05/2016.
  */
 public class GitKitIdentity {
-
-    @Autowired
     private static Environment environment;
 
     private GitKitIdentity() {
         throw new IllegalStateException("Cannot instantiate a utils class");
+    }
+
+    public static void setEnvironment(Environment environment) {
+        GitKitIdentity.environment = environment;
     }
 
     private static GoogleIdTokenVerifier VERIFIER = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
@@ -53,7 +54,7 @@ public class GitKitIdentity {
 
 
     private static GitkitClient getGitkitClient() throws IOException, GitkitClientException {
-        return  new GitkitClient.Builder()
+        return new GitkitClient.Builder()
                 .setGoogleClientId(environment.getProperty("clientId"))
                 .setProjectId(environment.getProperty("projectId"))
                 .setServiceAccountEmail(environment.getProperty("serviceAccountEmail"))
