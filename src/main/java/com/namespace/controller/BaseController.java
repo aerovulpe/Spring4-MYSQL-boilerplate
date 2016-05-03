@@ -1,6 +1,5 @@
 package com.namespace.controller;
 
-import com.google.identitytoolkit.GitkitUser;
 import com.namespace.model.Account;
 import com.namespace.security.GitKitProfile;
 import com.namespace.service.AccountManager;
@@ -40,17 +39,13 @@ public abstract class BaseController {
             return profile.get();
         }
 
-        GitkitUser gitkitUser = GitKitIdentity.getUser(request);
-        if (gitkitUser != null) {
-            GitKitProfile gitKitProfile = GitKitIdentity.gitKitProfileFromUser(accountManager, gitkitUser,
-                    GitKitIdentity.userHasVerifiedEmail(request), false);
-            if (gitKitProfile != null) {
-                manager.save(true, gitKitProfile, false);
-            }
-            return gitKitProfile;
+        // Fallback
+        GitKitProfile gitKitProfile = GitKitIdentity.getGitKitProfile(accountManager, request, false);
+        if (gitKitProfile != null) {
+            manager.save(true, gitKitProfile, false);
         }
 
-        return null;
+        return gitKitProfile;
     }
 
     protected Account accountFromProfile(CommonProfile profile) {

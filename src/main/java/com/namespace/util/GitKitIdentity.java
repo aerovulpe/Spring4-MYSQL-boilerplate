@@ -162,30 +162,44 @@ public class GitKitIdentity {
         }
     }
 
-    public static GitKitProfile gitKitProfileFromUser(AccountManager accountManager, GitkitUser gitkitUser,
-                                                      boolean isVerified, boolean updateAccount) {
-        boolean newAccount = false;
+    public static GitKitProfile getGitKitProfile(AccountManager accountManager, HttpServletRequest request,
+                                                 boolean updateAccount) {
+        return getGitKitProfile(accountManager, getAuthTokenFromRequest(request), updateAccount);
+    }
+
+    public static GitKitProfile getGitKitProfile(AccountManager accountManager, String gtoken, boolean updateAccount) {
+        GitkitUser gitkitUser = getUser(gtoken);
+        if (gitkitUser == null) {
+            return null;
+        }
+
         Account account = accountManager.getAccountByNaturalId(gitkitUser.getLocalId());
-        if (account == null) {
+        boolean newAccount = account == null;
+
+        if (!newAccount && !updateAccount) {
+            return gitKitProfileFromAccount(account);
+        }
+
+        if (newAccount) {
             account = new Account();
-            newAccount = true;
         }
         String[] names = gitkitUser.getName().split(" ");
         String lastName = names.length > 1 ? names[names.length - 1] : "";
         account.setNaturalId(gitkitUser.getLocalId());
         account.setFirstName(names[0]);
         account.setLastName(lastName);
+        account.setPictureUrl(gitkitUser.getPhotoUrl());
         account.setEmail(gitkitUser.getEmail());
-        account.addRole(Account.ROLE_USER);
-        account.addPermission(Account.PERMISSION_ENABLED);
-        if (isVerified) {
+        if (userHasVerifiedEmail(gtoken)) {
             account.addPermission(Account.PERMISSION_EMAIL_VERTIFIED);
         }
 
         try {
             if (newAccount) {
+                account.addRole(Account.ROLE_USER);
+                account.addPermission(Account.PERMISSION_ENABLED);
                 accountManager.createNewAccount(account);
-            } else if (updateAccount) {
+            } else {
                 accountManager.updateAccount(account);
             }
         } catch (Exception e) {
