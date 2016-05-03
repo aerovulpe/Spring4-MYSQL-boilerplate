@@ -30,9 +30,7 @@ public class Pac4JConfig {
         authorizers.put("admin", new RequireAllRolesAuthorizer<>(Account.ROLE_ADMIN, Account.ROLE_USER));
         authorizers.put("user", new RequireAllRolesAuthorizer<>(Account.ROLE_USER));
 
-        HeaderTokenClient headerTokenClient = new HeaderTokenClient("access_token",
-                new TimedJwtAuthenticator(JWT_SIGNING_SECRET, JWT_ENCRYPTION_SECRET));
-
-        return new Config(headerTokenClient, authorizers);
+        return new Config(new HeaderTokenClient("access_token",
+                new TimedJwtAuthenticator(JWT_SIGNING_SECRET, JWT_ENCRYPTION_SECRET)), authorizers);
     }
 }
