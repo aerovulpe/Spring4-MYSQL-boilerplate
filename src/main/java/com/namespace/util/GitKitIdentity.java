@@ -10,6 +10,8 @@ import com.google.identitytoolkit.GitkitUser;
 import com.namespace.model.Account;
 import com.namespace.security.GitKitProfile;
 import com.namespace.service.AccountManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 
 import javax.mail.Message;
 import javax.mail.Session;
@@ -21,6 +23,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -36,6 +39,9 @@ import java.util.Scanner;
  */
 public class GitKitIdentity {
 
+    @Autowired
+    private static Environment environment;
+
     private GitKitIdentity() {
         throw new IllegalStateException("Cannot instantiate a utils class");
     }
@@ -47,8 +53,14 @@ public class GitKitIdentity {
 
 
     private static GitkitClient getGitkitClient() throws IOException, GitkitClientException {
-        return GitkitClient.createFromJson(GitKitIdentity.class.getClassLoader()
-                .getResource("gitkit-server-config.json").getPath());
+        return  new GitkitClient.Builder()
+                .setGoogleClientId(environment.getProperty("clientId"))
+                .setProjectId(environment.getProperty("projectId"))
+                .setServiceAccountEmail(environment.getProperty("serviceAccountEmail"))
+                .setKeyStream(new FileInputStream(environment.getProperty("serviceAccountPrivateKeyFile")))
+                .setWidgetUrl(environment.getProperty("widgetUrl"))
+                .setCookieName(environment.getProperty("cookieName"))
+                .build();
     }
 
     public static boolean userHasVerifiedEmail(HttpServletRequest request) {
