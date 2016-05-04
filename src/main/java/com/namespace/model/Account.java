@@ -43,7 +43,7 @@ public class Account {
             joinColumns = @JoinColumn(name = "accountId")
     )
     @Column(name = "role")
-    private Set<String> roles;
+    private Set<String> roles = new HashSet<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
@@ -51,7 +51,7 @@ public class Account {
             joinColumns = @JoinColumn(name = "accountId")
     )
     @Column(name = "permission")
-    private Set<String> permissions;
+    private Set<String> permissions= new HashSet<>();
 
 
     public Long getId() {
@@ -190,8 +190,6 @@ public class Account {
         this.email = email;
         this.naturalId = naturalId;
         this.password = password;
-        this.roles = new HashSet<>();
-        this.permissions = new HashSet<>();
         gender = Gender.UNSPECIFIED;
     }
 

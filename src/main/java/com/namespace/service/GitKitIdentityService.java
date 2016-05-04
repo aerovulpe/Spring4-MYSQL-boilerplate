@@ -1,4 +1,4 @@
-package com.namespace.util;
+package com.namespace.service;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
@@ -6,69 +6,60 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.identitytoolkit.GitkitClient;
 import com.google.identitytoolkit.GitkitClientException;
+import com.google.identitytoolkit.GitkitServerException;
 import com.google.identitytoolkit.GitkitUser;
 import com.namespace.model.Account;
 import com.namespace.security.GitKitProfile;
-import com.namespace.service.AccountManager;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.stereotype.Service;
 
-import javax.mail.Message;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import javax.mail.MessagingException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Properties;
 import java.util.Scanner;
 
 
 /**
  * Created by Aaron on 03/05/2016.
  */
-public class GitKitIdentity {
-    private static Environment environment;
+@Service
+public class GitKitIdentityService {
+    @Autowired
+    private MailSender mailSender;
+    @Autowired
+    ServletContext servletContext;
 
-    private GitKitIdentity() {
-        throw new IllegalStateException("Cannot instantiate a utils class");
+    public GitKitIdentityService() {
     }
 
-    public static void setEnvironment(Environment environment) {
-        GitKitIdentity.environment = environment;
-    }
-
-    private static GoogleIdTokenVerifier VERIFIER = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
+    private GoogleIdTokenVerifier VERIFIER = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
             .setAudience(Arrays.asList("78186330076-uh8feq9a83r0q0bs25t4q33o946se40e.apps.googleusercontent.com"))
             .setIssuer("https://accounts.google.com")
             .build();
 
 
-    private static GitkitClient getGitkitClient() throws IOException, GitkitClientException {
-        return new GitkitClient.Builder()
-                .setGoogleClientId(environment.getProperty("clientId"))
-                .setProjectId(environment.getProperty("projectId"))
-                .setServiceAccountEmail(environment.getProperty("serviceAccountEmail"))
-                .setKeyStream(new FileInputStream(environment.getProperty("serviceAccountPrivateKeyFile")))
-                .setWidgetUrl(environment.getProperty("widgetUrl"))
-                .setCookieName(environment.getProperty("cookieName"))
-                .build();
+    private GitkitClient getGitkitClient() throws IOException, GitkitClientException {
+        return GitkitClient.createFromJson(getClass().getClassLoader()
+                .getResource("gitkit-server-config.json").getPath().substring(1));
     }
 
-    public static boolean userHasVerifiedEmail(HttpServletRequest request) {
+    public boolean userHasVerifiedEmail(HttpServletRequest request) {
         return userHasVerifiedEmail(getAuthTokenFromRequest(request));
     }
 
-    public static boolean userHasVerifiedEmail(String authToken) {
+    public boolean userHasVerifiedEmail(String authToken) {
         try {
             GoogleIdToken idToken = VERIFIER.verify(authToken);
             if (idToken != null) {
@@ -82,7 +73,7 @@ public class GitKitIdentity {
         }
     }
 
-    private static String getAuthTokenFromRequest(HttpServletRequest request) {
+    private String getAuthTokenFromRequest(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
             return null;
@@ -97,7 +88,7 @@ public class GitKitIdentity {
         return null;
     }
 
-    public static GitkitUser getUser(HttpServletRequest request) {
+    public GitkitUser getUser(HttpServletRequest request) {
         try {
             GitkitClient gitkitClient = getGitkitClient();
             return gitkitClient.validateTokenInRequest(request);
@@ -107,7 +98,7 @@ public class GitKitIdentity {
         }
     }
 
-    public static GitkitUser getUser(String authToken) {
+    public GitkitUser getUser(String authToken) {
         try {
             GitkitClient gitkitClient = getGitkitClient();
             return gitkitClient.validateToken(authToken);
@@ -118,8 +109,8 @@ public class GitKitIdentity {
     }
 
     //Gitkit Widget
-    public static void handleOauthCallback(ServletContext servletContext, HttpServletRequest request,
-                                           HttpServletResponse response) {
+    public void handleOauthCallback(HttpServletRequest request,
+                                    HttpServletResponse response) {
         response.setContentType("text/html");
 
         StringBuilder builder = new StringBuilder();
@@ -129,8 +120,7 @@ public class GitKitIdentity {
                 builder.append(line);
             }
             String postBody = URLEncoder.encode(builder.toString(), "UTF-8");
-            response.getWriter().print(new Scanner(new File(servletContext
-                    .getRealPath("static/gitkit-widget.html")), "UTF-8")
+            response.getWriter().print(new Scanner(new File(servletContext.getRealPath("/static/gitkit-widget.html")), "UTF-8")
                     .useDelimiter("\\A").next()
                     .replaceAll("JAVASCRIPT_ESCAPED_POST_BODY", postBody));
             response.setStatus(HttpServletResponse.SC_OK);
@@ -144,31 +134,28 @@ public class GitKitIdentity {
     }
 
     //Email Endpoint
-    public static void sendEmail(HttpServletRequest request, HttpServletResponse resp) {
+    public void sendEmail(HttpServletRequest request, HttpServletResponse resp) {
         try {
             GitkitClient gitkitClient = getGitkitClient();
             GitkitClient.OobResponse oobResponse = gitkitClient.getOobResponse(request);
 
-            Properties props = new Properties();
-            Session session = Session.getDefaultInstance(props, null);
-
             try {
-                Message msg = new MimeMessage(session);
-                msg.setFrom(new InternetAddress("aerisvulpe@gmail.com", "Spring Boilerplate Account"));
-                msg.addRecipient(Message.RecipientType.TO, new InternetAddress(oobResponse.getEmail(), oobResponse.getRecipient()));
+                String subject;
+                String text;
                 if (oobResponse.getOobAction().equals(GitkitClient.OobAction.CHANGE_EMAIL)) {
-                    msg.setSubject("Email address change for Spring Boilerplate account");
-                    msg.setText("Hello!\n\n The email address for your Spring Boilerplate account will be changed from "
+                    subject = "Email address change for Spring Boilerplate account";
+                    text = "Hello!\n\n The email address for your Spring Boilerplate account will be changed from "
                             + oobResponse.getEmail() + " to " + oobResponse.getNewEmail() +
                             " when you click this confirmation link:\n\n " + oobResponse.getOobUrl().get() +
-                            "\n\nIf you didn't request an email address change for this account, please disregard this message.");
+                            "\n\nIf you didn't request an email address change for this account, please disregard this message.";
+                    sendEmail(oobResponse.getEmail(), subject, text);
                 } else if (oobResponse.getOobAction().equals(GitkitClient.OobAction.RESET_PASSWORD)) {
-                    msg.setSubject("Password change for Spring Boilerplate account");
-                    msg.setText("Hello!\n\n The password for your Spring Boilerplate account will be reset " +
+                    subject = "Password change for Spring Boilerplate account";
+                    text = "Hello!\n\n The password for your Spring Boilerplate account will be reset " +
                             "when you click this confirmation link:\n\n " + oobResponse.getOobUrl().get() +
-                            "\n\nIf you didn't request a password change for this account, please disregard this message.");
+                            "\n\nIf you didn't request a password change for this account, please disregard this message.";
+                    sendEmail(oobResponse.getEmail(), subject, text);
                 }
-                Transport.send(msg);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -179,12 +166,12 @@ public class GitKitIdentity {
         }
     }
 
-    public static GitKitProfile getGitKitProfile(AccountManager accountManager, HttpServletRequest request,
-                                                 boolean updateAccount) {
+    public GitKitProfile getGitKitProfile(AccountManager accountManager, HttpServletRequest request,
+                                          boolean updateAccount) {
         return getGitKitProfile(accountManager, getAuthTokenFromRequest(request), updateAccount);
     }
 
-    public static GitKitProfile getGitKitProfile(AccountManager accountManager, String gtoken, boolean updateAccount) {
+    public GitKitProfile getGitKitProfile(AccountManager accountManager, String gtoken, boolean updateAccount) {
         GitkitUser gitkitUser = getUser(gtoken);
         if (gitkitUser == null) {
             return null;
@@ -200,15 +187,27 @@ public class GitKitIdentity {
         if (newAccount) {
             account = new Account();
         }
-        String[] names = gitkitUser.getName().split(" ");
-        String lastName = names.length > 1 ? names[names.length - 1] : "";
+        if (gitkitUser.getName() != null) {
+            String[] names = gitkitUser.getName().split(" ");
+            String lastName = names.length > 1 ? names[names.length - 1] : "";
+            account.setFirstName(names[0]);
+            account.setLastName(lastName);
+        } else {
+            account.setFirstName("");
+            account.setLastName("");
+        }
         account.setNaturalId(gitkitUser.getLocalId());
-        account.setFirstName(names[0]);
-        account.setLastName(lastName);
         account.setPictureUrl(gitkitUser.getPhotoUrl());
         account.setEmail(gitkitUser.getEmail());
         if (userHasVerifiedEmail(gtoken)) {
             account.addPermission(Account.PERMISSION_EMAIL_VERTIFIED);
+        } else {
+            try {
+                sendVerificationEmail(gitkitUser.getEmail(),
+                        getGitkitClient().getEmailVerificationLink(gitkitUser.getEmail()));
+            } catch (GitkitServerException | GitkitClientException | IOException | MessagingException e) {
+                e.printStackTrace();
+            }
         }
 
         try {
@@ -227,7 +226,28 @@ public class GitKitIdentity {
         return gitKitProfileFromAccount(account);
     }
 
-    private static GitKitProfile gitKitProfileFromAccount(Account account) {
+    private void sendVerificationEmail(String recipientEmail, String emailVerificationLink)
+            throws UnsupportedEncodingException, MessagingException {
+        String subject = "Verify email address for Spring Boilerplate account";
+        String text = "Hello!\n\n The email address for your Spring Boilerplate account needs to be verified. " +
+                "Please click this confirmation link:\n\n " + emailVerificationLink +
+                "\n\nIf you didn't sign up with this email address, please disregard this message.";
+
+        sendEmail(recipientEmail, subject, text);
+    }
+
+    private void sendEmail(String recipientEmail, String subject, String text)
+            throws MessagingException, UnsupportedEncodingException {
+        SimpleMailMessage message = new SimpleMailMessage();
+
+        message.setFrom("aerisvulpe@gmail.com");
+        message.setTo(recipientEmail);
+        message.setSubject(subject);
+        message.setText(text);
+        mailSender.send(message);
+    }
+
+    private GitKitProfile gitKitProfileFromAccount(Account account) {
         final GitKitProfile profile = new GitKitProfile();
         profile.setId(account.getNaturalId());
         profile.addAttribute("account_id", account.getId());

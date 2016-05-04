@@ -1,7 +1,6 @@
 package com.namespace.controller.api;
 
 import com.namespace.controller.BaseController;
-import com.namespace.util.GitKitIdentity;
 import com.namespace.util.Utils;
 import org.pac4j.core.profile.CommonProfile;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +22,7 @@ public class AuthController extends BaseController {
     @RequestMapping(value = "/token", method = GET)
     public Map jwt(@RequestParam("gtoken") String gtoken, HttpServletResponse response) throws Exception {
 
-        CommonProfile profile = GitKitIdentity.getGitKitProfile(accountManager, gtoken, true);
+        CommonProfile profile = gitKitIdentityService.getGitKitProfile(accountManager, gtoken, true);
         if (profile == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
