@@ -16,6 +16,7 @@ import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
@@ -37,19 +38,23 @@ public class GitKitIdentityService {
     @Autowired
     private MailSender mailSender;
     @Autowired
-    ServletContext servletContext;
+    private ServletContext servletContext;
     @Autowired
-    AccountManager accountManager;
+    private AccountManager accountManager;
     @Autowired
-    Environment environment;
+    private Environment environment;
+    private GoogleIdTokenVerifier VERIFIER;
 
     public GitKitIdentityService() {
     }
 
-    private GoogleIdTokenVerifier VERIFIER = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
-            .setAudience(Arrays.asList(environment.getProperty("clientId")))
-            .setIssuer("https://accounts.google.com")
-            .build();
+    @PostConstruct
+    public void init() {
+        VERIFIER = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
+                .setAudience(Arrays.asList(environment.getProperty("clientId")))
+                .setIssuer("https://accounts.google.com")
+                .build();
+    }
 
 
     private GitkitClient getGitkitClient() throws IOException, GitkitClientException {
