@@ -187,11 +187,16 @@ public class GitKitIdentity {
         if (newAccount) {
             account = new Account();
         }
-        String[] names = gitkitUser.getName().split(" ");
-        String lastName = names.length > 1 ? names[names.length - 1] : "";
+        if (gitkitUser.getName() != null) {
+            String[] names = gitkitUser.getName().split(" ");
+            String lastName = names.length > 1 ? names[names.length - 1] : "";
+            account.setFirstName(names[0]);
+            account.setLastName(lastName);
+        }else{
+            account.setFirstName("");
+            account.setLastName("");
+        }
         account.setNaturalId(gitkitUser.getLocalId());
-        account.setFirstName(names[0]);
-        account.setLastName(lastName);
         account.setPictureUrl(gitkitUser.getPhotoUrl());
         account.setEmail(gitkitUser.getEmail());
         if (userHasVerifiedEmail(gtoken)) {
