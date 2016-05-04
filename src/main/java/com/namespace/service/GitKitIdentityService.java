@@ -11,6 +11,7 @@ import com.google.identitytoolkit.GitkitUser;
 import com.namespace.model.Account;
 import com.namespace.security.GitKitProfile;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
@@ -20,10 +21,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
@@ -42,19 +40,27 @@ public class GitKitIdentityService {
     ServletContext servletContext;
     @Autowired
     AccountManager accountManager;
+    @Autowired
+    Environment environment;
 
     public GitKitIdentityService() {
     }
 
     private GoogleIdTokenVerifier VERIFIER = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
-            .setAudience(Arrays.asList("78186330076-uh8feq9a83r0q0bs25t4q33o946se40e.apps.googleusercontent.com"))
+            .setAudience(Arrays.asList(environment.getProperty("clientId")))
             .setIssuer("https://accounts.google.com")
             .build();
 
 
     private GitkitClient getGitkitClient() throws IOException, GitkitClientException {
-        return GitkitClient.createFromJson(getClass().getClassLoader()
-                .getResource("gitkit-server-config.json").getPath().substring(1));
+        return new GitkitClient.Builder()
+                .setGoogleClientId(environment.getProperty("clientId"))
+                .setProjectId(environment.getProperty("projectId"))
+                .setServiceAccountEmail(environment.getProperty("serviceAccountEmail"))
+                .setKeyStream(new FileInputStream(environment.getProperty("serviceAccountPrivateKeyFile")))
+                .setWidgetUrl(environment.getProperty("widgetUrl"))
+                .setCookieName(environment.getProperty("cookieName"))
+                .build();
     }
 
     public boolean userHasVerifiedEmail(HttpServletRequest request) {

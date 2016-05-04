@@ -37,19 +37,10 @@ import java.util.Properties;
 public class WebAppConfig extends WebMvcConfigurerAdapter {
 
     private static final String PROPERTY_NAME_DATABASE_DRIVER = "db.driver";
-    private static final String PROPERTY_NAME_DATABASE_PASSWORD = "db.password";
-    private static final String PROPERTY_NAME_DATABASE_URL = "db.url";
-    private static final String PROPERTY_NAME_DATABASE_USERNAME = "db.username";
     private static final String PROPERTY_NAME_HIBERNATE_DIALECT = "hibernate.dialect";
     private static final String PROPERTY_NAME_HIBERNATE_SHOW_SQL = "hibernate.show_sql";
     private static final String PROPERTY_NAME_ENTITYMANAGER_PACKAGES_TO_SCAN = "entitymanager.packages.to.scan";
     private static final String PROPERTY_NAME_JADIRA_USERTYPE_AUTO_REGISTER_USER_TYPES = "spring.jpa.properties.jadira.usertype.autoRegisterUserTypes";
-    private static final String PROPERTY_NAME_EMAIL_HOST = "email.host";
-    private static final String PROPERTY_NAME_EMAIL_PORT = "email.port";
-    private static final String PROPERTY_NAME_EMAIL_USERNAME = "email.username";
-    private static final String PROPERTY_NAME_EMAIL_PASSWORD = "email.password";
-    private static final String PROPERTY_NAME_EMAIL_TRANSPORT_PROTOCOL = "email.transport.protocol";
-    private static final String PROPERTY_NAME_EMAIL_FROM_EMAIL = "email.from.email";
 
 
     @Resource
@@ -89,16 +80,16 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     @Bean
     public JavaMailSenderImpl mailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost(environment.getProperty(PROPERTY_NAME_EMAIL_HOST));
-        mailSender.setPort(Integer.parseInt(environment.getProperty(PROPERTY_NAME_EMAIL_PORT)));
-        mailSender.setUsername(environment.getProperty(PROPERTY_NAME_EMAIL_USERNAME));
-        mailSender.setPassword(environment.getProperty(PROPERTY_NAME_EMAIL_PASSWORD));
-        mailSender.setProtocol(environment.getProperty(PROPERTY_NAME_EMAIL_TRANSPORT_PROTOCOL));
+        mailSender.setHost(environment.getProperty("EMAIL_HOST"));
+        mailSender.setPort(Integer.parseInt(environment.getProperty("EMAIL_PORT")));
+        mailSender.setUsername(environment.getProperty("EMAIL_USERNAME"));
+        mailSender.setPassword(environment.getProperty("EMAIL_PASSWORD"));
+        mailSender.setProtocol(environment.getProperty("EMAIL_TRANSPORT_PROTOCOL"));
 
         Properties javaMailProperties = new Properties();
         javaMailProperties.put("mail.smtp.auth", true);
         javaMailProperties.put("mail.smtp.starttls.enable", true);
-        javaMailProperties.put("mail.from.email", environment.getRequiredProperty(PROPERTY_NAME_EMAIL_FROM_EMAIL));
+        javaMailProperties.put("mail.from.email", environment.getRequiredProperty("EMAIL_FROM_EMAIL"));
 
         mailSender.setJavaMailProperties(javaMailProperties);
         return mailSender;
@@ -108,9 +99,9 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_DRIVER));
-        dataSource.setUrl(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_URL));
-        dataSource.setUsername(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_USERNAME));
-        dataSource.setPassword(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_PASSWORD));
+        dataSource.setUrl(environment.getRequiredProperty("CLEARDB_DATABASE_URL"));
+        dataSource.setUsername(environment.getRequiredProperty("CLEARDB_USERNAME"));
+        dataSource.setPassword(environment.getRequiredProperty("CLEARDB_PASSWORD"));
         return dataSource;
     }
 
