@@ -40,6 +40,8 @@ public class GitKitIdentityService {
     private MailSender mailSender;
     @Autowired
     ServletContext servletContext;
+    @Autowired
+    AccountManager accountManager;
 
     public GitKitIdentityService() {
     }
@@ -166,12 +168,12 @@ public class GitKitIdentityService {
         }
     }
 
-    public GitKitProfile getGitKitProfile(AccountManager accountManager, HttpServletRequest request,
+    public GitKitProfile getGitKitProfile(HttpServletRequest request,
                                           boolean updateAccount) {
-        return getGitKitProfile(accountManager, getAuthTokenFromRequest(request), updateAccount);
+        return getGitKitProfile(getAuthTokenFromRequest(request), updateAccount);
     }
 
-    public GitKitProfile getGitKitProfile(AccountManager accountManager, String gtoken, boolean updateAccount) {
+    public GitKitProfile getGitKitProfile(String gtoken, boolean updateAccount) {
         GitkitUser gitkitUser = getUser(gtoken);
         if (gitkitUser == null) {
             return null;
