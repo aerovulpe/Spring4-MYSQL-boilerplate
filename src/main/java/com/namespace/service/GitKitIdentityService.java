@@ -39,9 +39,9 @@ public class GitKitIdentityService {
     @Autowired
     private MailSender mailSender;
     @Autowired
-    ServletContext servletContext;
+    private ServletContext servletContext;
     @Autowired
-    AccountManager accountManager;
+    private AccountManager accountManager;
 
     public GitKitIdentityService() {
     }
