@@ -69,7 +69,7 @@ public class ApplicationLogoutController {
     }
 
     @PostConstruct
-    public void postContruct() {
+    public void postConstruct() {
         if (CommonHelper.isBlank(defaultUrl)) {
             this.defaultUrl = Pac4jConstants.DEFAULT_URL_VALUE;
         }
