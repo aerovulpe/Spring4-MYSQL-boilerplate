@@ -22,7 +22,7 @@ public class AuthController extends BaseController {
     @RequestMapping(value = "/token", method = GET)
     public Map jwt(@RequestParam("gtoken") String gtoken, HttpServletResponse response) throws Exception {
 
-        CommonProfile profile = gitKitIdentityService.getGitKitProfile(accountManager, gtoken, true);
+        CommonProfile profile = gitKitIdentityService.getGitKitProfile(gtoken, true);
         if (profile == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }

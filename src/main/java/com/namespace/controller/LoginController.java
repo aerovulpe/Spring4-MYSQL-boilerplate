@@ -47,7 +47,7 @@ public class LoginController extends BaseController {
 
     @RequestMapping("/gitkit/success")
     public String gitkitSignIn(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        GitKitProfile gitKitProfile = gitKitIdentityService.getGitKitProfile(accountManager, request, true);
+        GitKitProfile gitKitProfile = gitKitIdentityService.getGitKitProfile(request, true);
         if (gitKitProfile != null) {
             new ProfileManager<>(new J2EContext(request, response)).save(true, gitKitProfile, false);
         }

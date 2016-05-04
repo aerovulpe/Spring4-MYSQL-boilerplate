@@ -42,7 +42,7 @@ public abstract class BaseController {
         }
 
         // Fallback
-        GitKitProfile gitKitProfile = gitKitIdentityService.getGitKitProfile(accountManager, request, false);
+        GitKitProfile gitKitProfile = gitKitIdentityService.getGitKitProfile(request, false);
         if (gitKitProfile != null) {
             manager.save(true, gitKitProfile, false);
         }
