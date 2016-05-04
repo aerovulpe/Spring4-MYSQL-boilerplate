@@ -3,7 +3,7 @@ package com.namespace.controller;
 import com.namespace.model.Account;
 import com.namespace.security.GitKitProfile;
 import com.namespace.service.AccountManager;
-import com.namespace.util.GitKitIdentity;
+import com.namespace.service.GitKitIdentityService;
 import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.profile.CommonProfile;
@@ -29,6 +29,8 @@ public abstract class BaseController {
     protected ServletContext servletContext;
     @Autowired
     protected AccountManager accountManager;
+    @Autowired
+    protected GitKitIdentityService gitKitIdentityService;
 
     protected CommonProfile getProfile(HttpServletRequest request, HttpServletResponse response) {
         final WebContext context = new J2EContext(request, response);
@@ -40,7 +42,7 @@ public abstract class BaseController {
         }
 
         // Fallback
-        GitKitProfile gitKitProfile = GitKitIdentity.getGitKitProfile(accountManager, request, false);
+        GitKitProfile gitKitProfile = gitKitIdentityService.getGitKitProfile(accountManager, request, false);
         if (gitKitProfile != null) {
             manager.save(true, gitKitProfile, false);
         }

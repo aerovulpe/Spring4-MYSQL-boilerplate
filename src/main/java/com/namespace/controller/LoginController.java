@@ -2,7 +2,6 @@ package com.namespace.controller;
 
 import com.namespace.model.Account;
 import com.namespace.security.GitKitProfile;
-import com.namespace.util.GitKitIdentity;
 import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.ProfileManager;
@@ -48,7 +47,7 @@ public class LoginController extends BaseController {
 
     @RequestMapping("/gitkit/success")
     public String gitkitSignIn(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        GitKitProfile gitKitProfile = GitKitIdentity.getGitKitProfile(accountManager, request, true);
+        GitKitProfile gitKitProfile = gitKitIdentityService.getGitKitProfile(accountManager, request, true);
         if (gitKitProfile != null) {
             new ProfileManager<>(new J2EContext(request, response)).save(true, gitKitProfile, false);
         }
@@ -59,7 +58,12 @@ public class LoginController extends BaseController {
     @RequestMapping("/oauth2callback")
     public void gitkitWidget(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        GitKitIdentity.handleOauthCallback(servletContext, request, response);
+        gitKitIdentityService.handleOauthCallback(request, response);
+    }
+
+    @RequestMapping("/email")
+    public void gitkitEmail(HttpServletRequest request, HttpServletResponse response) {
+        gitKitIdentityService.sendEmail(request, response);
     }
 }
 

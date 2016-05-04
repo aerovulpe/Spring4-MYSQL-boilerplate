@@ -10,6 +10,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -32,6 +33,7 @@ import java.util.Properties;
 @EnableWebMvc
 @EnableTransactionManagement
 @PropertySource("classpath:application.properties")
+@PropertySource("classpath:email.properties")
 public class WebAppConfig extends WebMvcConfigurerAdapter {
 
     private static final String PROPERTY_NAME_DATABASE_DRIVER = "db.driver";
@@ -41,7 +43,14 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     private static final String PROPERTY_NAME_HIBERNATE_DIALECT = "hibernate.dialect";
     private static final String PROPERTY_NAME_HIBERNATE_SHOW_SQL = "hibernate.show_sql";
     private static final String PROPERTY_NAME_ENTITYMANAGER_PACKAGES_TO_SCAN = "entitymanager.packages.to.scan";
-    public static final String PROPERTY_NAME_JADIRA_USERTYPE_AUTO_REGISTER_USER_TYPES = "spring.jpa.properties.jadira.usertype.autoRegisterUserTypes";
+    private static final String PROPERTY_NAME_JADIRA_USERTYPE_AUTO_REGISTER_USER_TYPES = "spring.jpa.properties.jadira.usertype.autoRegisterUserTypes";
+    private static final String PROPERTY_NAME_EMAIL_HOST = "email.host";
+    private static final String PROPERTY_NAME_EMAIL_PORT = "email.port";
+    private static final String PROPERTY_NAME_EMAIL_USERNAME = "email.username";
+    private static final String PROPERTY_NAME_EMAIL_PASSWORD = "email.password";
+    private static final String PROPERTY_NAME_EMAIL_TRANSPORT_PROTOCOL = "email.transport.protocol";
+    private static final String PROPERTY_NAME_EMAIL_FROM_EMAIL = "email.from.email";
+
 
     @Resource
     private Environment environment;
@@ -75,6 +84,24 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
         messageSource.setBasename("messages");
         return messageSource;
+    }
+
+    @Bean
+    public JavaMailSenderImpl mailSender() {
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        mailSender.setHost(environment.getProperty(PROPERTY_NAME_EMAIL_HOST));
+        mailSender.setPort(Integer.parseInt(environment.getProperty(PROPERTY_NAME_EMAIL_PORT)));
+        mailSender.setUsername(environment.getProperty(PROPERTY_NAME_EMAIL_USERNAME));
+        mailSender.setPassword(environment.getProperty(PROPERTY_NAME_EMAIL_PASSWORD));
+        mailSender.setProtocol(environment.getProperty(PROPERTY_NAME_EMAIL_TRANSPORT_PROTOCOL));
+
+        Properties javaMailProperties = new Properties();
+        javaMailProperties.put("mail.smtp.auth", true);
+        javaMailProperties.put("mail.smtp.starttls.enable", true);
+        javaMailProperties.put("mail.from.email", environment.getRequiredProperty(PROPERTY_NAME_EMAIL_FROM_EMAIL));
+
+        mailSender.setJavaMailProperties(javaMailProperties);
+        return mailSender;
     }
 
     @Bean
