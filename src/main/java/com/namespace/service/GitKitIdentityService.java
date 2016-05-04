@@ -56,7 +56,6 @@ public class GitKitIdentityService {
                 .build();
     }
 
-
     private GitkitClient getGitkitClient() throws IOException, GitkitClientException {
         return new GitkitClient.Builder()
                 .setGoogleClientId(environment.getProperty("clientId"))
