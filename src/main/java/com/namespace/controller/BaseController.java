@@ -66,7 +66,6 @@ public abstract class BaseController {
                 Gender.valueOf(profile.getAttribute("gender", String.class)));
         account.setLocale(profile.getLocale() == null ? null : profile.getLocale().toLanguageTag());
         account.setLocation(profile.getLocation());
-        account.setRemembered(profile.isRemembered());
         account.setRoles(new HashSet<>(profile.getRoles()));
         account.setPermissions(new HashSet<>(profile.getPermissions()));
         return account;

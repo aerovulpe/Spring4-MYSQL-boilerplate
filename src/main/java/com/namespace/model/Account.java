@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@JsonIgnoreProperties({"naturalId", "password", "remembered", "ipAddresses"})
+@JsonIgnoreProperties({"naturalId", "password"})
 @Table(name = "accounts")
 public class Account {
     public static final String ROLE_USER = "ROLE_USER";
@@ -35,7 +35,6 @@ public class Account {
     private String locale;
     private String pictureUrl;
     private String location;
-    private boolean isRemembered;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
@@ -151,14 +150,6 @@ public class Account {
         this.permissions = permissions;
     }
 
-    public boolean isRemembered() {
-        return isRemembered;
-    }
-
-    public void setRemembered(boolean remembered) {
-        isRemembered = remembered;
-    }
-
     public void addRole(String role) {
         roles.add(role);
     }
@@ -210,7 +201,6 @@ public class Account {
                 ", locale='" + locale + '\'' +
                 ", pictureUrl='" + pictureUrl + '\'' +
                 ", location='" + location + '\'' +
-                ", isRemembered=" + isRemembered +
                 ", roles=" + roles +
                 ", permissions=" + permissions +
                 '}';
