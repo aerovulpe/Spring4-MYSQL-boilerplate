@@ -3,7 +3,6 @@ package com.namespace.service;
 import com.google.gson.JsonObject;
 import com.google.identitytoolkit.GitkitClient;
 import com.google.identitytoolkit.GitkitClientException;
-import com.google.identitytoolkit.GitkitServerException;
 import com.namespace.model.Account;
 import com.namespace.security.GitKitProfile;
 import com.sendgrid.SendGrid;
@@ -166,22 +165,18 @@ public class GitKitIdentityService {
             account.setPictureUrl(gitkitUserPayload.get("photo_url").getAsString());
         }
         account.setEmail(email);
-        if (gitkitUserPayload.get("verified").getAsBoolean()) {
-            account.addPermission(Account.PERMISSION_EMAIL_VERTIFIED);
-        } else {
-            try {
-                sendVerificationEmail(email,
-                        GITKIT_CLIENT.getEmailVerificationLink(email));
-            } catch (GitkitServerException | GitkitClientException | SendGridException e) {
-                e.printStackTrace();
-            }
-        }
 
         try {
             if (newAccount) {
                 account.addRole(Account.ROLE_USER);
                 account.addPermission(Account.PERMISSION_ENABLED);
                 accountManager.createNewAccount(account);
+                if (gitkitUserPayload.get("verified").getAsBoolean()) {
+                    account.addPermission(Account.PERMISSION_EMAIL_VERTIFIED);
+                } else {
+                    sendVerificationEmail(email, GITKIT_CLIENT.getEmailVerificationLink(email));
+
+                }
             } else {
                 accountManager.updateAccount(account);
             }
