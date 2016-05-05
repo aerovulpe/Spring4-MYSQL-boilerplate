@@ -233,7 +233,6 @@ public class GitKitIdentityService {
         profile.addAttribute("locale", account.getLocale());
         profile.addAttribute("picture_url", account.getPictureUrl());
         profile.addAttribute("location", account.getLocation());
-        profile.setRemembered(account.isRemembered());
         profile.addRoles(new ArrayList<>(account.getRoles()));
         profile.addPermissions(new ArrayList<>(account.getPermissions()));
         return profile;

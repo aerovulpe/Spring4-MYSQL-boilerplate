@@ -1,5 +1,6 @@
-/src/main/resources/email.properties
 /src/main/resources/gitkit-server-config.json
 /Spring4-boilerplate.iml
 target/
+/src/main/resources/application.properties
+/src/main/resources/spring-boilerplate-628f6ab05f03.p12
 .idea/
