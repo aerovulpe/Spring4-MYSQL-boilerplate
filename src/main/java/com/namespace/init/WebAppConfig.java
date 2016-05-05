@@ -82,16 +82,16 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
 
     @Bean
     public SendGrid sendGrid(){
-        return new SendGrid(environment.getProperty(PROPERTY_NAME_SENDGRID_API_KEY));
+        return new SendGrid(environment.getProperty("SENDGRID_API_KEY"));
     }
 
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_DRIVER));
-        dataSource.setUrl(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_URL));
-        dataSource.setUsername(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_USERNAME));
-        dataSource.setPassword(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_PASSWORD));
+        dataSource.setUrl(environment.getRequiredProperty("CLEARDB_DATABASE_URL"));
+        dataSource.setUsername(environment.getRequiredProperty("CLEARDB_USERNAME"));
+        dataSource.setPassword(environment.getRequiredProperty("CLEARDB_PASSWORD"));
         return dataSource;
     }
 
