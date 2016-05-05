@@ -21,7 +21,7 @@ public class GitkitAuthenticator implements TokenAuthenticator {
     public void validate(TokenCredentials credentials) throws RequiresHttpAction {
         GitKitProfile profile;
         try {
-            profile = gitKitIdentityService.getGitKitProfile(credentials.getToken(), true);
+            profile = gitKitIdentityService.getGitKitProfile(credentials.getToken(), false);
         } catch (Exception e) {
             throw new CredentialsException("Could not authenticate user.");
         }

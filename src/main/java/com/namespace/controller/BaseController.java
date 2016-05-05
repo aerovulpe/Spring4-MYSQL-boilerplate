@@ -44,7 +44,7 @@ public abstract class BaseController {
         }
 
         // Fallback
-        GitKitProfile gitKitProfile = gitKitIdentityService.getGitKitProfile(request, false);
+        GitKitProfile gitKitProfile = gitKitIdentityService.getGitKitProfile(request, true);
         if (gitKitProfile != null) {
             LoggerFactory.getLogger(BaseController.class).info("Fallback!");
             manager.save(true, gitKitProfile, false);
