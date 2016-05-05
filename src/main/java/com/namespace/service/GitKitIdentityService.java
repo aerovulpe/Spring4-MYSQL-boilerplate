@@ -6,7 +6,6 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.identitytoolkit.GitkitClient;
 import com.google.identitytoolkit.GitkitClientException;
-import com.google.identitytoolkit.GitkitServerException;
 import com.google.identitytoolkit.GitkitUser;
 import com.namespace.model.Account;
 import com.namespace.security.GitKitProfile;
@@ -201,16 +200,16 @@ public class GitKitIdentityService {
         account.setNaturalId(gitkitUser.getLocalId());
         account.setPictureUrl(gitkitUser.getPhotoUrl());
         account.setEmail(gitkitUser.getEmail());
-        if (userHasVerifiedEmail(gtoken)) {
-            account.addPermission(Account.PERMISSION_EMAIL_VERTIFIED);
-        } else {
-            try {
-                sendVerificationEmail(gitkitUser.getEmail(),
-                        getGitkitClient().getEmailVerificationLink(gitkitUser.getEmail()));
-            } catch (GitkitServerException | GitkitClientException | IOException | MessagingException e) {
-                e.printStackTrace();
-            }
-        }
+//        if (userHasVerifiedEmail(gtoken)) {
+//            account.addPermission(Account.PERMISSION_EMAIL_VERTIFIED);
+//        } else {
+//            try {
+//                sendVerificationEmail(gitkitUser.getEmail(),
+//                        getGitkitClient().getEmailVerificationLink(gitkitUser.getEmail()));
+//            } catch (GitkitServerException | GitkitClientException | IOException | MessagingException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
         try {
             if (newAccount) {
