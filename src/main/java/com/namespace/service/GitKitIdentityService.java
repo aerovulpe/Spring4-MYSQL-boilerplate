@@ -9,6 +9,7 @@ import com.namespace.security.GitKitProfile;
 import com.sendgrid.SendGrid;
 import com.sendgrid.SendGridException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.ServletContext;
@@ -16,6 +17,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -31,6 +33,8 @@ public class GitKitIdentityService {
     @Autowired
     private ServletContext servletContext;
     @Autowired
+    private Environment environment;
+    @Autowired
     private AccountManager accountManager;
     @Autowired
     private SendGrid sendGrid;
@@ -38,9 +42,15 @@ public class GitKitIdentityService {
 
     {
         try {
-            GITKIT_CLIENT = GitkitClient.createFromJson(getClass().getClassLoader()
-                    .getResource("gitkit-server-config.json").getPath().substring(1));
-        } catch (GitkitClientException | IOException e) {
+            GITKIT_CLIENT = new GitkitClient.Builder()
+                    .setGoogleClientId(environment.getProperty("clientId"))
+                    .setProjectId(environment.getProperty("projectId"))
+                    .setServiceAccountEmail(environment.getProperty("serviceAccountEmail"))
+                    .setKeyStream(new FileInputStream(environment.getProperty("serviceAccountPrivateKeyFile")))
+                    .setWidgetUrl(environment.getProperty("widgetUrl"))
+                    .setCookieName(environment.getProperty("cookieName"))
+                    .build();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
