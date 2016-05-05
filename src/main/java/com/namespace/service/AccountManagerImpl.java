@@ -2,17 +2,11 @@ package com.namespace.service;
 
 import com.namespace.dao.AccountDAO;
 import com.namespace.model.Account;
-import com.namespace.service.dto.AccountForm;
-import com.namespace.service.dto.AccountFormAssembler;
-import com.namespace.service.validator.AccountCreationValidator;
-import com.namespace.service.validator.AccountUpdateDetailsValidator;
-import com.namespace.service.validator.AccountUpdatePasswordValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
 
 import java.util.List;
 
@@ -24,21 +18,6 @@ public class AccountManagerImpl implements AccountManager {
 
     @Autowired
     private AccountDAO accountDAO;
-    @Autowired
-    private AccountCreationValidator accountCreationValidator;
-    @Autowired
-    private AccountUpdatePasswordValidator accountUpdatePasswordValidator;
-    @Autowired
-    private AccountUpdateDetailsValidator accountUpdateDetailsValidator;
-
-    public AccountManagerImpl(AccountDAO accountDAO, AccountCreationValidator accountCreationValidator,
-                              AccountUpdatePasswordValidator accountUpdatePasswordValidator,
-                              AccountUpdateDetailsValidator accountUpdateDetailsValidator) {
-        this.accountDAO = accountDAO;
-        this.accountCreationValidator = accountCreationValidator;
-        this.accountUpdatePasswordValidator = accountUpdatePasswordValidator;
-        this.accountUpdateDetailsValidator = accountUpdateDetailsValidator;
-    }
 
     public AccountManagerImpl() {
     }
@@ -133,50 +112,5 @@ public class AccountManagerImpl implements AccountManager {
         } catch (Exception e) {
             return null;
         }
-    }
-
-    @Override
-    public Account createNewAccount(AccountForm model, BindingResult result) throws Exception {
-        accountCreationValidator.validate(model, result);
-
-        if (result.hasErrors()) {
-            return null;
-        } else {
-            Account account = AccountFormAssembler.copyNewAccountFromAccountForm(model);
-            createNewAccount(account);
-            return account;
-        }
-    }
-
-    @Override
-    public Account updateAccount(String naturalId, boolean details, AccountForm model, BindingResult result) {
-        Account account;
-        if (details) {
-            logger.info("updateAccount() : details");
-
-            accountUpdateDetailsValidator.validate(model, result);
-
-            if (result.hasErrors()) {
-                return null;
-            } else {
-                account = AccountFormAssembler
-                        .updateAccountDetailsFromAccountForm(model, getAccountByNaturalId(naturalId));
-            }
-        } else {
-            logger.info("updating password");
-
-            accountUpdatePasswordValidator.validate(model, result);
-
-            if (result.hasErrors()) {
-                logger.info("validation error!");
-                return null;
-            } else {
-                account = getAccountByNaturalId(naturalId);
-                account.setPassword(model.getPassword());
-            }
-        }
-
-        updateAccount(account);
-        return account;
     }
 }

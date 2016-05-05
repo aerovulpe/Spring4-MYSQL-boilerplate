@@ -1,9 +1,11 @@
 package com.namespace.controller;
 
 import com.namespace.model.Account;
+import com.namespace.service.GitKitIdentityService;
 import org.pac4j.core.profile.CommonProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -21,6 +23,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 public class LoginController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
+    @Autowired
+    private GitKitIdentityService gitKitIdentityService;
 
     public LoginController() {
     }

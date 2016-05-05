@@ -113,25 +113,21 @@ public class GitKitIdentityService {
         try {
             GitkitClient.OobResponse oobResponse = GITKIT_CLIENT.getOobResponse(request);
 
-            try {
-                String subject;
-                String text;
-                if (oobResponse.getOobAction().equals(GitkitClient.OobAction.CHANGE_EMAIL)) {
-                    subject = "Email address change for Spring Boilerplate account";
-                    text = "Hello!\n\n The email address for your Spring Boilerplate account will be changed from "
-                            + oobResponse.getEmail() + " to " + oobResponse.getNewEmail() +
-                            " when you click this confirmation link:\n\n " + oobResponse.getOobUrl().get() +
-                            "\n\nIf you didn't request an email address change for this account, please disregard this message.";
-                    sendEmail(oobResponse.getEmail(), subject, text);
-                } else if (oobResponse.getOobAction().equals(GitkitClient.OobAction.RESET_PASSWORD)) {
-                    subject = "Password change for Spring Boilerplate account";
-                    text = "Hello!\n\n The password for your Spring Boilerplate account will be reset " +
-                            "when you click this confirmation link:\n\n " + oobResponse.getOobUrl().get() +
-                            "\n\nIf you didn't request a password change for this account, please disregard this message.";
-                    sendEmail(oobResponse.getEmail(), subject, text);
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            String subject;
+            String text;
+            if (oobResponse.getOobAction().equals(GitkitClient.OobAction.CHANGE_EMAIL)) {
+                subject = "Email address change for Spring Boilerplate account";
+                text = "Hello!\n\n The email address for your Spring Boilerplate account will be changed from "
+                        + oobResponse.getEmail() + " to " + oobResponse.getNewEmail() +
+                        " when you click this confirmation link:\n\n " + oobResponse.getOobUrl().get() +
+                        "\n\nIf you didn't request an email address change for this account, please disregard this message.";
+                sendEmail(oobResponse.getEmail(), subject, text);
+            } else if (oobResponse.getOobAction().equals(GitkitClient.OobAction.RESET_PASSWORD)) {
+                subject = "Password change for Spring Boilerplate account";
+                text = "Hello!\n\n The password for your Spring Boilerplate account will be reset " +
+                        "when you click this confirmation link:\n\n " + oobResponse.getOobUrl().get() +
+                        "\n\nIf you didn't request a password change for this account, please disregard this message.";
+                sendEmail(oobResponse.getEmail(), subject, text);
             }
 
             resp.getWriter().write(oobResponse.getResponseBody());
@@ -140,8 +136,7 @@ public class GitKitIdentityService {
         }
     }
 
-    public GitKitProfile getGitKitProfile(HttpServletRequest request,
-                                          boolean updateAccount) {
+    public GitKitProfile getGitKitProfile(HttpServletRequest request, boolean updateAccount) {
         return getGitKitProfile(getAuthTokenFromRequest(request), updateAccount);
     }
 

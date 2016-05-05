@@ -53,6 +53,20 @@ public class Account {
     private Set<String> permissions = new HashSet<>();
 
 
+    public Account(@NotNull String naturalId, String password, @NotNull String firstName, @NotNull String lastName,
+                   @NotNull String email) {
+        this();
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.naturalId = naturalId;
+        this.password = password;
+    }
+
+    public Account() {
+        gender = Gender.UNSPECIFIED;
+    }
+
     public Long getId() {
         return id;
     }
@@ -65,7 +79,7 @@ public class Account {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
+    public void setFirstName(@NotNull String firstName) {
         this.firstName = firstName;
     }
 
@@ -73,7 +87,7 @@ public class Account {
         return lastName;
     }
 
-    public void setLastName(String lastName) {
+    public void setLastName(@NotNull String lastName) {
         this.lastName = lastName;
     }
 
@@ -81,7 +95,7 @@ public class Account {
         return email;
     }
 
-    public void setEmail(String email) {
+    public void setEmail(@NotNull String email) {
         this.email = email;
     }
 
@@ -89,7 +103,7 @@ public class Account {
         return naturalId;
     }
 
-    public void setNaturalId(String naturalId) {
+    public void setNaturalId(@NotNull String naturalId) {
         this.naturalId = naturalId;
     }
 
@@ -172,20 +186,6 @@ public class Account {
 
     public boolean hasPermission(String permission) {
         return permissions.contains(permission);
-    }
-
-    public Account(@NotNull String naturalId, String password, @NotNull String firstName, @NotNull String lastName,
-                   @NotNull String email) {
-        this();
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.naturalId = naturalId;
-        this.password = password;
-    }
-
-    public Account() {
-        gender = Gender.UNSPECIFIED;
     }
 
     @Override
