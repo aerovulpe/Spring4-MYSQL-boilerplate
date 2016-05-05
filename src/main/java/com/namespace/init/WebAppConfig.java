@@ -2,6 +2,7 @@ package com.namespace.init;
 
 
 import com.namespace.web.RequiresAuthenticationInterceptor;
+import com.sendgrid.SendGrid;
 import org.pac4j.core.config.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,7 +11,6 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -36,10 +36,14 @@ import java.util.Properties;
 public class WebAppConfig extends WebMvcConfigurerAdapter {
 
     private static final String PROPERTY_NAME_DATABASE_DRIVER = "db.driver";
+    private static final String PROPERTY_NAME_DATABASE_PASSWORD = "db.password";
+    private static final String PROPERTY_NAME_DATABASE_URL = "db.url";
+    private static final String PROPERTY_NAME_DATABASE_USERNAME = "db.username";
     private static final String PROPERTY_NAME_HIBERNATE_DIALECT = "hibernate.dialect";
     private static final String PROPERTY_NAME_HIBERNATE_SHOW_SQL = "hibernate.show_sql";
     private static final String PROPERTY_NAME_ENTITYMANAGER_PACKAGES_TO_SCAN = "entitymanager.packages.to.scan";
     private static final String PROPERTY_NAME_JADIRA_USERTYPE_AUTO_REGISTER_USER_TYPES = "spring.jpa.properties.jadira.usertype.autoRegisterUserTypes";
+    private static final String PROPERTY_NAME_SENDGRID_API_KEY = "sendgrid_api_key";
 
 
     @Resource
@@ -77,30 +81,17 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     }
 
     @Bean
-    public JavaMailSenderImpl mailSender() {
-        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost(environment.getProperty("EMAIL_HOST"));
-        mailSender.setPort(Integer.parseInt(environment.getProperty("EMAIL_PORT")));
-        mailSender.setUsername(environment.getProperty("EMAIL_USERNAME"));
-        mailSender.setPassword(environment.getProperty("EMAIL_PASSWORD"));
-        mailSender.setProtocol(environment.getProperty("EMAIL_TRANSPORT_PROTOCOL"));
-
-        Properties javaMailProperties = new Properties();
-        javaMailProperties.put("mail.smtp.auth", true);
-        javaMailProperties.put("mail.smtp.starttls.enable", true);
-        javaMailProperties.put("mail.from.email", environment.getRequiredProperty("EMAIL_FROM_EMAIL"));
-
-        mailSender.setJavaMailProperties(javaMailProperties);
-        return mailSender;
+    public SendGrid sendGrid(){
+        return new SendGrid(environment.getProperty(PROPERTY_NAME_SENDGRID_API_KEY));
     }
 
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_DRIVER));
-        dataSource.setUrl(environment.getRequiredProperty("CLEARDB_DATABASE_URL"));
-        dataSource.setUsername(environment.getRequiredProperty("CLEARDB_USERNAME"));
-        dataSource.setPassword(environment.getRequiredProperty("CLEARDB_PASSWORD"));
+        dataSource.setUrl(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_URL));
+        dataSource.setUsername(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_USERNAME));
+        dataSource.setPassword(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_PASSWORD));
         return dataSource;
     }
 
