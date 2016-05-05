@@ -1,8 +1,6 @@
 package com.namespace.service;
 
 import com.namespace.model.Account;
-import com.namespace.service.dto.AccountForm;
-import org.springframework.validation.BindingResult;
 
 import java.util.List;
 
@@ -24,8 +22,4 @@ public interface AccountManager {
     Account closeAccount(String naturalId);
 
     Account deleteAccountByNaturalId(String naturalId);
-
-    Account createNewAccount(AccountForm model, BindingResult result) throws Exception;
-
-    Account updateAccount(String naturalId, boolean details, AccountForm model, BindingResult result);
 }

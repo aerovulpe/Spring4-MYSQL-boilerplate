@@ -55,6 +55,11 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     @Value("${pac4j.applicationLogout.logoutUrlPattern:}")
     private String logoutUrlPattern;
 
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
+
     @Override
     public void addResourceHandlers(final ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/assets/**").addResourceLocations("/assets/");
@@ -69,11 +74,6 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     }
 
     @Bean
-    public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
-        return new PropertySourcesPlaceholderConfigurer();
-    }
-
-    @Bean
     public ResourceBundleMessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
         messageSource.setBasename("messages");
@@ -81,7 +81,7 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     }
 
     @Bean
-    public SendGrid sendGrid(){
+    public SendGrid sendGrid() {
         return new SendGrid(environment.getProperty(PROPERTY_NAME_SENDGRID_API_KEY));
     }
 

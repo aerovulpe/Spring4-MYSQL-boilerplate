@@ -2,7 +2,6 @@ package com.namespace.controller;
 
 import com.namespace.model.Account;
 import com.namespace.security.GitKitProfile;
-import com.namespace.service.AccountManager;
 import com.namespace.service.GitKitIdentityService;
 import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.context.WebContext;
@@ -30,9 +29,7 @@ public abstract class BaseController {
     @Autowired
     protected ServletContext servletContext;
     @Autowired
-    protected AccountManager accountManager;
-    @Autowired
-    protected GitKitIdentityService gitKitIdentityService;
+    private GitKitIdentityService gitKitIdentityService;
 
     protected CommonProfile getProfile(HttpServletRequest request, HttpServletResponse response) {
         final WebContext context = new J2EContext(request, response);
@@ -71,8 +68,13 @@ public abstract class BaseController {
         return account;
     }
 
-    private static String getUserNaturalId(CommonProfile profile) {
+    protected String getUserNaturalId(CommonProfile profile) {
         return profile.getId();
+    }
+
+    protected String getUserNaturalId(HttpServletRequest request, HttpServletResponse response) {
+        CommonProfile profile = getProfile(request, response);
+        return profile == null ? null : getUserNaturalId(profile);
     }
 
     void serveHtmlPage(String path, HttpServletResponse response) {

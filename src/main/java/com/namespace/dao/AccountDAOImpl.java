@@ -1,10 +1,8 @@
 package com.namespace.dao;
 
 import com.namespace.model.Account;
-import org.pac4j.core.util.CommonHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,7 +11,6 @@ import java.util.List;
 public class AccountDAOImpl extends SessionDAO<Account, Long> implements AccountDAO {
 
     private static final Logger logger = LoggerFactory.getLogger(AccountDAOImpl.class);
-    private static final BCryptPasswordEncoder BCRYPT_PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
     @Override
     @SuppressWarnings("unchecked")
@@ -60,8 +57,6 @@ public class AccountDAOImpl extends SessionDAO<Account, Long> implements Account
 
     @Override
     public Long create(Account account) {
-        if (account.getPassword() != null)
-            account.setPassword(getHashPassword(account.getPassword()));
         return (Long) getCurrentSession().save(account);
     }
 
@@ -74,8 +69,9 @@ public class AccountDAOImpl extends SessionDAO<Account, Long> implements Account
     public boolean update(Account account) {
         logger.info("update()");
 
-        if (account == null || account.getNaturalId() == null)
+        if (account == null || account.getNaturalId() == null) {
             return false;
+        }
 
         logger.info("verify if this account already exist " +
                 "in the database: " + account.toString());
@@ -87,10 +83,9 @@ public class AccountDAOImpl extends SessionDAO<Account, Long> implements Account
             return false;
         }
 
-        if (CommonHelper.areNotEquals(account.getPassword(), accountToUpdate.getPassword()))
-            accountToUpdate.setPassword(getHashPassword(account.getPassword()));
         accountToUpdate.setFirstName(account.getFirstName());
         accountToUpdate.setLastName(account.getLastName());
+        accountToUpdate.setPassword(account.getPassword());
         accountToUpdate.setEmail(account.getEmail());
         accountToUpdate.setGender(account.getGender());
         accountToUpdate.setLocale(account.getLocale());
@@ -116,9 +111,5 @@ public class AccountDAOImpl extends SessionDAO<Account, Long> implements Account
         logger.info("Confirmed: this account already exist.");
         getCurrentSession().delete(accountToDelete);
         return true;
-    }
-
-    private String getHashPassword(String password) {
-        return BCRYPT_PASSWORD_ENCODER.encode(password);
     }
 }

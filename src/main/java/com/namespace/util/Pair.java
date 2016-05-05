@@ -1,6 +1,6 @@
 package com.namespace.util;
 
-public class Pair<A,B> {
+public class Pair<A, B> {
     private final A a;
     private final B b;
 
@@ -9,16 +9,16 @@ public class Pair<A,B> {
         this.b = b;
     }
 
-	public A getA() {
-		return a;
-	}
+    public A getA() {
+        return a;
+    }
 
-	public B getB() {
-		return b;
-	}
+    public B getB() {
+        return b;
+    }
 
-	@Override
-	public String toString() {
-		return "Pair [a=" + a + ", b=" + b + "]";
-	}
+    @Override
+    public String toString() {
+        return "Pair [a=" + a + ", b=" + b + "]";
+    }
 }
