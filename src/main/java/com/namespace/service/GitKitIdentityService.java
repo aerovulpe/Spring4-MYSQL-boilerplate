@@ -136,6 +136,7 @@ public class GitKitIdentityService {
 
         String userId = gitkitUserPayload.get("user_id").getAsString();
         String email = gitkitUserPayload.get("email").getAsString();
+        boolean verified = gitkitUserPayload.get("verified").getAsBoolean();
         Account account = accountManager.getAccountByNaturalId(userId);
         boolean newAccount = account == null;
 
@@ -160,16 +161,16 @@ public class GitKitIdentityService {
             account.setPictureUrl(gitkitUserPayload.get("photo_url").getAsString());
         }
         account.setEmail(email);
+        if (verified) {
+            account.addPermission(Account.PERMISSION_EMAIL_VERTIFIED);
+        }
 
         try {
             if (newAccount) {
                 account.addRole(Account.ROLE_USER);
                 account.addPermission(Account.PERMISSION_ENABLED);
-                if (gitkitUserPayload.get("verified").getAsBoolean()) {
-                    account.addPermission(Account.PERMISSION_EMAIL_VERTIFIED);
-                } else {
+                if (!verified) {
                     sendVerificationEmail(email, GITKIT_CLIENT.getEmailVerificationLink(email));
-
                 }
                 accountManager.createNewAccount(account);
             } else {
