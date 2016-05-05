@@ -6,15 +6,15 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.identitytoolkit.GitkitClient;
 import com.google.identitytoolkit.GitkitClientException;
+import com.google.identitytoolkit.GitkitServerException;
 import com.google.identitytoolkit.GitkitUser;
 import com.namespace.model.Account;
 import com.namespace.security.GitKitProfile;
+import com.sendgrid.SendGrid;
+import com.sendgrid.SendGridException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.MailSender;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
-import javax.mail.MessagingException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
@@ -36,11 +35,11 @@ import java.util.Scanner;
 @Service
 public class GitKitIdentityService {
     @Autowired
-    private MailSender mailSender;
-    @Autowired
     private ServletContext servletContext;
     @Autowired
     private AccountManager accountManager;
+    @Autowired
+    private SendGrid sendGrid;
 
     public GitKitIdentityService() {
     }
@@ -200,16 +199,16 @@ public class GitKitIdentityService {
         account.setNaturalId(gitkitUser.getLocalId());
         account.setPictureUrl(gitkitUser.getPhotoUrl());
         account.setEmail(gitkitUser.getEmail());
-//        if (userHasVerifiedEmail(gtoken)) {
-//            account.addPermission(Account.PERMISSION_EMAIL_VERTIFIED);
-//        } else {
-//            try {
-//                sendVerificationEmail(gitkitUser.getEmail(),
-//                        getGitkitClient().getEmailVerificationLink(gitkitUser.getEmail()));
-//            } catch (GitkitServerException | GitkitClientException | IOException | MessagingException e) {
-//                e.printStackTrace();
-//            }
-//        }
+        if (userHasVerifiedEmail(gtoken)) {
+            account.addPermission(Account.PERMISSION_EMAIL_VERTIFIED);
+        } else {
+            try {
+                sendVerificationEmail(gitkitUser.getEmail(),
+                        getGitkitClient().getEmailVerificationLink(gitkitUser.getEmail()));
+            } catch (GitkitServerException | GitkitClientException | IOException | SendGridException e) {
+                e.printStackTrace();
+            }
+        }
 
         try {
             if (newAccount) {
@@ -228,7 +227,7 @@ public class GitKitIdentityService {
     }
 
     private void sendVerificationEmail(String recipientEmail, String emailVerificationLink)
-            throws UnsupportedEncodingException, MessagingException {
+            throws SendGridException {
         String subject = "Verify email address for Spring Boilerplate account";
         String text = "Hello!\n\n The email address for your Spring Boilerplate account needs to be verified. " +
                 "Please click this confirmation link:\n\n " + emailVerificationLink +
@@ -238,14 +237,13 @@ public class GitKitIdentityService {
     }
 
     private void sendEmail(String recipientEmail, String subject, String text)
-            throws MessagingException, UnsupportedEncodingException {
-        SimpleMailMessage message = new SimpleMailMessage();
-
-        message.setFrom("aerisvulpe@gmail.com");
-        message.setTo(recipientEmail);
-        message.setSubject(subject);
-        message.setText(text);
-        mailSender.send(message);
+            throws SendGridException {
+        SendGrid.Email email = new SendGrid.Email();
+        email.addTo(recipientEmail);
+        email.setFrom("aerisvulpe@gmail.com");
+        email.setSubject(subject);
+        email.setText(text);
+        SendGrid.Response response = sendGrid.send(email);
     }
 
     private GitKitProfile gitKitProfileFromAccount(Account account) {
