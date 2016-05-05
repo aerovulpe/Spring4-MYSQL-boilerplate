@@ -170,13 +170,13 @@ public class GitKitIdentityService {
             if (newAccount) {
                 account.addRole(Account.ROLE_USER);
                 account.addPermission(Account.PERMISSION_ENABLED);
-                accountManager.createNewAccount(account);
                 if (gitkitUserPayload.get("verified").getAsBoolean()) {
                     account.addPermission(Account.PERMISSION_EMAIL_VERTIFIED);
                 } else {
                     sendVerificationEmail(email, GITKIT_CLIENT.getEmailVerificationLink(email));
 
                 }
+                accountManager.createNewAccount(account);
             } else {
                 accountManager.updateAccount(account);
             }
