@@ -1,13 +1,9 @@
 package com.namespace.service;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.gson.JsonObject;
 import com.google.identitytoolkit.GitkitClient;
 import com.google.identitytoolkit.GitkitClientException;
 import com.google.identitytoolkit.GitkitServerException;
-import com.google.identitytoolkit.GitkitUser;
 import com.namespace.model.Account;
 import com.namespace.security.GitKitProfile;
 import com.sendgrid.SendGrid;
@@ -23,9 +19,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Scanner;
 
 
@@ -40,37 +34,18 @@ public class GitKitIdentityService {
     private AccountManager accountManager;
     @Autowired
     private SendGrid sendGrid;
+    private GitkitClient GITKIT_CLIENT;
+
+    {
+        try {
+            GITKIT_CLIENT = GitkitClient.createFromJson(getClass().getClassLoader()
+                    .getResource("gitkit-server-config.json").getPath().substring(1));
+        } catch (GitkitClientException | IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public GitKitIdentityService() {
-    }
-
-    private GoogleIdTokenVerifier VERIFIER = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
-            .setAudience(Arrays.asList("78186330076-uh8feq9a83r0q0bs25t4q33o946se40e.apps.googleusercontent.com"))
-            .setIssuer("https://accounts.google.com")
-            .build();
-
-
-    private GitkitClient getGitkitClient() throws IOException, GitkitClientException {
-        return GitkitClient.createFromJson(getClass().getClassLoader()
-                .getResource("gitkit-server-config.json").getPath().substring(1));
-    }
-
-    public boolean userHasVerifiedEmail(HttpServletRequest request) {
-        return userHasVerifiedEmail(getAuthTokenFromRequest(request));
-    }
-
-    public boolean userHasVerifiedEmail(String authToken) {
-        try {
-            GoogleIdToken idToken = VERIFIER.verify(authToken);
-            if (idToken != null) {
-                return idToken.getPayload().getEmailVerified();
-            }
-
-            return false;
-        } catch (GeneralSecurityException | IOException e) {
-            e.printStackTrace();
-            return false;
-        }
     }
 
     private String getAuthTokenFromRequest(HttpServletRequest request) {
@@ -88,21 +63,10 @@ public class GitKitIdentityService {
         return null;
     }
 
-    public GitkitUser getUser(HttpServletRequest request) {
+    private JsonObject getUserPayload(String authToken) {
         try {
-            GitkitClient gitkitClient = getGitkitClient();
-            return gitkitClient.validateTokenInRequest(request);
-        } catch (GitkitClientException | IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public GitkitUser getUser(String authToken) {
-        try {
-            GitkitClient gitkitClient = getGitkitClient();
-            return gitkitClient.validateToken(authToken);
-        } catch (GitkitClientException | IOException e) {
+            return GITKIT_CLIENT.validateTokenToJson(authToken);
+        } catch (GitkitClientException e) {
             e.printStackTrace();
             return null;
         }
@@ -136,8 +100,7 @@ public class GitKitIdentityService {
     //Email Endpoint
     public void sendEmail(HttpServletRequest request, HttpServletResponse resp) {
         try {
-            GitkitClient gitkitClient = getGitkitClient();
-            GitkitClient.OobResponse oobResponse = gitkitClient.getOobResponse(request);
+            GitkitClient.OobResponse oobResponse = GITKIT_CLIENT.getOobResponse(request);
 
             try {
                 String subject;
@@ -172,12 +135,14 @@ public class GitKitIdentityService {
     }
 
     public GitKitProfile getGitKitProfile(String gtoken, boolean updateAccount) {
-        GitkitUser gitkitUser = getUser(gtoken);
-        if (gitkitUser == null) {
+        JsonObject gitkitUserPayload = getUserPayload(gtoken);
+        if (gitkitUserPayload == null) {
             return null;
         }
 
-        Account account = accountManager.getAccountByNaturalId(gitkitUser.getLocalId());
+        String userId = gitkitUserPayload.get("user_id").getAsString();
+        String email = gitkitUserPayload.get("email").getAsString();
+        Account account = accountManager.getAccountByNaturalId(userId);
         boolean newAccount = account == null;
 
         if (!newAccount && !updateAccount) {
@@ -187,8 +152,8 @@ public class GitKitIdentityService {
         if (newAccount) {
             account = new Account();
         }
-        if (gitkitUser.getName() != null) {
-            String[] names = gitkitUser.getName().split(" ");
+        if (gitkitUserPayload.has("display_name")) {
+            String[] names = gitkitUserPayload.get("display_name").getAsString().split(" ");
             String lastName = names.length > 1 ? names[names.length - 1] : "";
             account.setFirstName(names[0]);
             account.setLastName(lastName);
@@ -196,16 +161,18 @@ public class GitKitIdentityService {
             account.setFirstName("");
             account.setLastName("");
         }
-        account.setNaturalId(gitkitUser.getLocalId());
-        account.setPictureUrl(gitkitUser.getPhotoUrl());
-        account.setEmail(gitkitUser.getEmail());
-        if (userHasVerifiedEmail(gtoken)) {
+        account.setNaturalId(userId);
+        if (gitkitUserPayload.has("photo_url")) {
+            account.setPictureUrl(gitkitUserPayload.get("photo_url").getAsString());
+        }
+        account.setEmail(email);
+        if (gitkitUserPayload.get("verified").getAsBoolean()) {
             account.addPermission(Account.PERMISSION_EMAIL_VERTIFIED);
         } else {
             try {
-                sendVerificationEmail(gitkitUser.getEmail(),
-                        getGitkitClient().getEmailVerificationLink(gitkitUser.getEmail()));
-            } catch (GitkitServerException | GitkitClientException | IOException | SendGridException e) {
+                sendVerificationEmail(email,
+                        GITKIT_CLIENT.getEmailVerificationLink(email));
+            } catch (GitkitServerException | GitkitClientException | SendGridException e) {
                 e.printStackTrace();
             }
         }
@@ -243,7 +210,7 @@ public class GitKitIdentityService {
         email.setFrom("aerisvulpe@gmail.com");
         email.setSubject(subject);
         email.setText(text);
-        SendGrid.Response response = sendGrid.send(email);
+        sendGrid.send(email);
     }
 
     private GitKitProfile gitKitProfileFromAccount(Account account) {

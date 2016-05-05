@@ -51,7 +51,7 @@ public class Account {
             joinColumns = @JoinColumn(name = "accountId")
     )
     @Column(name = "permission")
-    private Set<String> permissions= new HashSet<>();
+    private Set<String> permissions = new HashSet<>();
 
 
     public Long getId() {
@@ -185,15 +185,16 @@ public class Account {
 
     public Account(@NotNull String naturalId, String password, @NotNull String firstName, @NotNull String lastName,
                    @NotNull String email) {
+        this();
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.naturalId = naturalId;
         this.password = password;
-        gender = Gender.UNSPECIFIED;
     }
 
     public Account() {
+        gender = Gender.UNSPECIFIED;
     }
 
     @Override
