@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +41,11 @@ public class GitKitIdentityService {
     private SendGrid sendGrid;
     private GitkitClient GITKIT_CLIENT;
 
-    {
+    public GitKitIdentityService() {
+    }
+
+    @PostConstruct
+    public void postConstruct() {
         try {
             GITKIT_CLIENT = new GitkitClient.Builder()
                     .setGoogleClientId(environment.getProperty("clientId"))
@@ -53,9 +58,6 @@ public class GitKitIdentityService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public GitKitIdentityService() {
     }
 
     private String getAuthTokenFromRequest(HttpServletRequest request) {
