@@ -13,6 +13,7 @@ import java.util.List;
 public class AccountDAOImpl extends SessionDAO<Account, Long> implements AccountDAO {
 
     private static final Logger logger = LoggerFactory.getLogger(AccountDAOImpl.class);
+    private static final BCryptPasswordEncoder BCRYPT_PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
     @Override
     @SuppressWarnings("unchecked")
@@ -118,6 +119,6 @@ public class AccountDAOImpl extends SessionDAO<Account, Long> implements Account
     }
 
     private String getHashPassword(String password) {
-        return new BCryptPasswordEncoder().encode(password);
+        return BCRYPT_PASSWORD_ENCODER.encode(password);
     }
 }

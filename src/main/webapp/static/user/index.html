@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link type=text/css rel=stylesheet href="//www.gstatic.com/authtoolkit/css/gitkit.css"/>
+<script type="text/javascript" src="//www.gstatic.com/authtoolkit/js/gitkit.js"></script>
+<script type=text/javascript>
+    window.google.identitytoolkit.signInButton(
+            '#navbar', // accepts any CSS selector
+            {
+                widgetUrl: "http://localhost:8080/oauth2callback",
+                signOutUrl: "/logout?url=/"
+            }
+    );
+</script>
+<head>
+    <title>Hello User!</title>
+</head>
+<body>
+<a>User Panel</a>
+<div id="navbar"></div>
+</body>
+</html>

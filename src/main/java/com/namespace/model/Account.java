@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@JsonIgnoreProperties({"naturalId", "password", "remembered", "ipAddresses"})
+@JsonIgnoreProperties({"naturalId", "password"})
 @Table(name = "accounts")
 public class Account {
     public static final String ROLE_USER = "ROLE_USER";
@@ -29,13 +29,12 @@ public class Account {
 
     private String firstName;
     private String lastName;
-    @Column(name = "email", unique = true, nullable = false)
+    @Column(name = "email", nullable = false)
     private String email;
     private Gender gender;
     private String locale;
     private String pictureUrl;
     private String location;
-    private boolean isRemembered;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
@@ -43,7 +42,7 @@ public class Account {
             joinColumns = @JoinColumn(name = "accountId")
     )
     @Column(name = "role")
-    private Set<String> roles;
+    private Set<String> roles = new HashSet<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
@@ -51,7 +50,7 @@ public class Account {
             joinColumns = @JoinColumn(name = "accountId")
     )
     @Column(name = "permission")
-    private Set<String> permissions;
+    private Set<String> permissions = new HashSet<>();
 
 
     public Long getId() {
@@ -151,14 +150,6 @@ public class Account {
         this.permissions = permissions;
     }
 
-    public boolean isRemembered() {
-        return isRemembered;
-    }
-
-    public void setRemembered(boolean remembered) {
-        isRemembered = remembered;
-    }
-
     public void addRole(String role) {
         roles.add(role);
     }
@@ -185,17 +176,16 @@ public class Account {
 
     public Account(@NotNull String naturalId, String password, @NotNull String firstName, @NotNull String lastName,
                    @NotNull String email) {
+        this();
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.naturalId = naturalId;
         this.password = password;
-        this.roles = new HashSet<>();
-        this.permissions = new HashSet<>();
-        gender = Gender.UNSPECIFIED;
     }
 
     public Account() {
+        gender = Gender.UNSPECIFIED;
     }
 
     @Override
@@ -211,7 +201,6 @@ public class Account {
                 ", locale='" + locale + '\'' +
                 ", pictureUrl='" + pictureUrl + '\'' +
                 ", location='" + location + '\'' +
-                ", isRemembered=" + isRemembered +
                 ", roles=" + roles +
                 ", permissions=" + permissions +
                 '}';

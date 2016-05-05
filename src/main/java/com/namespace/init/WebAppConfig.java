@@ -2,6 +2,7 @@ package com.namespace.init;
 
 
 import com.namespace.web.RequiresAuthenticationInterceptor;
+import com.sendgrid.SendGrid;
 import org.pac4j.core.config.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +29,7 @@ import java.util.Properties;
  */
 @Configuration
 @ComponentScan({"com.namespace"})
-@Import({Pac4JConfig.class, ViewConfig.class})
+@Import({Pac4JConfig.class})
 @EnableWebMvc
 @EnableTransactionManagement
 @PropertySource("classpath:application.properties")
@@ -41,7 +42,9 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     private static final String PROPERTY_NAME_HIBERNATE_DIALECT = "hibernate.dialect";
     private static final String PROPERTY_NAME_HIBERNATE_SHOW_SQL = "hibernate.show_sql";
     private static final String PROPERTY_NAME_ENTITYMANAGER_PACKAGES_TO_SCAN = "entitymanager.packages.to.scan";
-    public static final String PROPERTY_NAME_JADIRA_USERTYPE_AUTO_REGISTER_USER_TYPES = "spring.jpa.properties.jadira.usertype.autoRegisterUserTypes";
+    private static final String PROPERTY_NAME_JADIRA_USERTYPE_AUTO_REGISTER_USER_TYPES = "spring.jpa.properties.jadira.usertype.autoRegisterUserTypes";
+    private static final String PROPERTY_NAME_SENDGRID_API_KEY = "sendgrid_api_key";
+
 
     @Resource
     private Environment environment;
@@ -55,21 +58,14 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addResourceHandlers(final ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/assets/**").addResourceLocations("/assets/");
+        registry.addResourceHandler("/static/**").addResourceLocations("/static/");
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new LocaleChangeInterceptor());
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "GoogleOidcClient", "user"))
-                .addPathPatterns("/login/oidc");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "FacebookClient", "user"))
-                .addPathPatterns("/login/facebook");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "IndirectBasicAuthClient", "user"))
-                .addPathPatterns("/login/iba");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "DirectBasicAuthClient", "user"))
-                .addPathPatterns("/jwt/dba");
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "HeaderTokenClient", "user"))
-                .addPathPatterns("/api/account");
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "HeaderTokenClient, GitkitClient", "user"))
+                .addPathPatterns("/api/accounts/**");
     }
 
     @Bean
@@ -82,6 +78,11 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
         messageSource.setBasename("messages");
         return messageSource;
+    }
+
+    @Bean
+    public SendGrid sendGrid(){
+        return new SendGrid(environment.getProperty(PROPERTY_NAME_SENDGRID_API_KEY));
     }
 
     @Bean

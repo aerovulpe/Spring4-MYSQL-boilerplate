@@ -1,21 +1,19 @@
 package com.namespace.security;
 
-
 import org.pac4j.core.client.DirectClientV2;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.TokenCredentials;
 import org.pac4j.core.credentials.authenticator.TokenAuthenticator;
-import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.util.CommonHelper;
+import org.pac4j.http.credentials.extractor.CookieExtractor;
 
 /**
- * Created by Aaron on 22/04/2016.
+ * Created by Aaron on 05/05/2016.
  */
-public class HeaderTokenClient extends DirectClientV2<TokenCredentials, CommonProfile> {
-
+public class GitkitClient extends DirectClientV2<TokenCredentials, GitKitProfile> {
     private String tokenName;
 
-    public HeaderTokenClient(final String tokenName, final TokenAuthenticator tokenAuthenticator) {
+    public GitkitClient(final String tokenName, final TokenAuthenticator tokenAuthenticator) {
         this.tokenName = tokenName;
         setAuthenticator(tokenAuthenticator);
     }
@@ -23,7 +21,7 @@ public class HeaderTokenClient extends DirectClientV2<TokenCredentials, CommonPr
     @Override
     protected void internalInit(final WebContext context) {
         CommonHelper.assertNotBlank("tokenName", this.tokenName);
-        setCredentialsExtractor(new HeaderTokenExtractor(tokenName, getName()));
+        setCredentialsExtractor(new CookieExtractor(tokenName, getName()));
         super.internalInit(context);
     }
 }
