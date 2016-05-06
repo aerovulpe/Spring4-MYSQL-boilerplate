@@ -5,15 +5,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Enforce Https for Heroku
+ * */
 public class HttpsEnforcer implements Filter {
-
-    private FilterConfig filterConfig;
 
     private static final String X_FORWARDED_PROTO = "x-forwarded-proto";
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        this.filterConfig = filterConfig;
+        // nothing
     }
 
     @Override
