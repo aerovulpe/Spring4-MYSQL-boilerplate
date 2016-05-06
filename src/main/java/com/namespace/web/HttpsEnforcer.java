@@ -20,18 +20,23 @@ public class HttpsEnforcer implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
-
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        if (request.getHeader(X_FORWARDED_PROTO) != null) {
-            if (request.getHeader(X_FORWARDED_PROTO).indexOf("https") != 0) {
-                response.sendRedirect("https://" + request.getServerName() + request.getPathInfo());
-                return;
+        String headerXForwarded = request.getHeader(X_FORWARDED_PROTO);
+        if (headerXForwarded != null && (!headerXForwarded.contains("https"))) {
+            String url = "https://" + request.getServerName();
+            if (request.getPathInfo() != null) {
+                url += request.getPathInfo();
             }
+            if (request.getQueryString() != null) {
+                url += request.getQueryString();
+            }
+            response.sendRedirect(url);
+            return;
         }
 
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(servletRequest, servletResponse);
     }
 
     @Override
