@@ -7,7 +7,7 @@ import java.io.IOException;
 
 /**
  * Enforce Https for Heroku
- * */
+ */
 public class HttpsEnforcer implements Filter {
 
     private static final String X_FORWARDED_PROTO = "x-forwarded-proto";
@@ -21,17 +21,22 @@ public class HttpsEnforcer implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
 
-        HttpServletRequest request = (HttpServletRequest) servletRequest;
-        HttpServletResponse response = (HttpServletResponse) servletResponse;
+        if (servletRequest instanceof HttpServletRequest && servletResponse instanceof HttpServletResponse) {
+            HttpServletRequest request = (HttpServletRequest) servletRequest;
+            HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        if (request.getHeader(X_FORWARDED_PROTO) != null) {
-            if (request.getHeader(X_FORWARDED_PROTO).indexOf("https") != 0) {
-                response.sendRedirect("https://" + request.getServerName() + request.getPathInfo());
+            String headerXForwarded = request.getHeader(X_FORWARDED_PROTO);
+            if (headerXForwarded != null && (!headerXForwarded.contains("https"))) {
+                String url = "https://" + request.getServerName();
+                if (request.getPathInfo() != null) {
+                    url += request.getPathInfo();
+                }
+                response.sendRedirect(url);
                 return;
             }
         }
 
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(servletRequest, servletResponse);
     }
 
     @Override
