@@ -1,4 +1,4 @@
-package com.namespace.security;
+package com.namespace.security.jwt;
 
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.DirectEncrypter;
@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public class TimedJwtGenerator<U extends CommonProfile> extends JwtGenerator<U> {
 
-    public static final int LONG_ACCESS_TOKEN_TIME = 500;
+    public static final int LONG_ACCESS_TOKEN_TIME = 750;
 
     public TimedJwtGenerator(String signingSecret, String encryptionSecret) {
         super(signingSecret, encryptionSecret);

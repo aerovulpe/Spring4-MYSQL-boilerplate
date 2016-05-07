@@ -2,26 +2,40 @@ package com.namespace.init;
 
 
 import com.namespace.web.RequiresAuthenticationInterceptor;
+import com.namespace.web.exception.BadRequestException;
+import com.namespace.web.exception.ForbiddenException;
+import com.namespace.web.exception.InternalServerErrorException;
+import com.namespace.web.exception.UnAuthorizedException;
 import com.sendgrid.SendGrid;
+import cz.jirutka.spring.exhandler.RestHandlerExceptionResolver;
+import cz.jirutka.spring.exhandler.handlers.ErrorMessageRestExceptionHandler;
+import cz.jirutka.spring.exhandler.support.HttpMessageConverterUtils;
 import org.pac4j.core.config.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -61,16 +75,41 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     }
 
     @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new LocaleChangeInterceptor());
+        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "HeaderTokenClient, GitkitClient", "user"))
+                .addPathPatterns("/api/accounts/**");
+    }
+
+    @Override
     public void addResourceHandlers(final ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/assets/**").addResourceLocations("/assets/");
         registry.addResourceHandler("/static/**").addResourceLocations("/static/");
     }
 
     @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new LocaleChangeInterceptor());
-        registry.addInterceptor(new RequiresAuthenticationInterceptor(pac4JConfig, "HeaderTokenClient, GitkitClient", "user"))
-                .addPathPatterns("/api/accounts/**");
+    public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
+        ExceptionHandlerExceptionResolver resolver = new ExceptionHandlerExceptionResolver();
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+
+        messageSource.setBasename("classpath:messages");
+        messageSource.setDefaultEncoding("UTF-8");
+
+        resolver.setMessageConverters(HttpMessageConverterUtils.getDefaultHttpMessageConverters());
+        resolvers.add(resolver); // resolves @ExceptionHandler
+        resolvers.add(RestHandlerExceptionResolver.builder()
+                .defaultContentType(MediaType.APPLICATION_JSON)
+                .messageSource(messageSource)
+                .addErrorMessageHandler(EmptyResultDataAccessException.class, HttpStatus.NOT_FOUND)
+                .addHandler(BadRequestException.class,
+                        new ErrorMessageRestExceptionHandler<>(BadRequestException.class, HttpStatus.BAD_REQUEST))
+                .addHandler(ForbiddenException.class,
+                        new ErrorMessageRestExceptionHandler<>(ForbiddenException.class, HttpStatus.FORBIDDEN))
+                .addHandler(InternalServerErrorException.class,
+                        new ErrorMessageRestExceptionHandler<>(InternalServerErrorException.class, HttpStatus.INTERNAL_SERVER_ERROR))
+                .addHandler(UnAuthorizedException.class,
+                        new ErrorMessageRestExceptionHandler<>(UnAuthorizedException.class, HttpStatus.UNAUTHORIZED))
+                .build());
     }
 
     @Bean
@@ -93,6 +132,10 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
         dataSource.setUsername(environment.getRequiredProperty("CLEARDB_USERNAME"));
         dataSource.setPassword(environment.getRequiredProperty("CLEARDB_PASSWORD"));
         return dataSource;
+    public HibernateTransactionManager transactionManager() {
+        HibernateTransactionManager transactionManager = new HibernateTransactionManager();
+        transactionManager.setSessionFactory(sessionFactory().getObject());
+        return transactionManager;
     }
 
     @Bean
@@ -106,10 +149,13 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     }
 
     @Bean
-    public HibernateTransactionManager transactionManager() {
-        HibernateTransactionManager transactionManager = new HibernateTransactionManager();
-        transactionManager.setSessionFactory(sessionFactory().getObject());
-        return transactionManager;
+    public DataSource dataSource() {
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_DRIVER));
+        dataSource.setUrl(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_URL));
+        dataSource.setUsername(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_USERNAME));
+        dataSource.setPassword(environment.getRequiredProperty(PROPERTY_NAME_DATABASE_PASSWORD));
+        return dataSource;
     }
 
     private Properties hibProperties() {

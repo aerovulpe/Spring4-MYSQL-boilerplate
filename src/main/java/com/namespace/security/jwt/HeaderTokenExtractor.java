@@ -1,4 +1,4 @@
-package com.namespace.security;
+package com.namespace.security.jwt;
 
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.TokenCredentials;

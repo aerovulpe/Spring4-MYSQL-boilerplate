@@ -3,8 +3,10 @@ package com.namespace.service;
 import com.google.gson.JsonObject;
 import com.google.identitytoolkit.GitkitClient;
 import com.google.identitytoolkit.GitkitClientException;
+import com.google.identitytoolkit.GitkitServerException;
 import com.namespace.model.Account;
-import com.namespace.security.GitKitProfile;
+import com.namespace.security.gitkit.GitKitProfile;
+import com.namespace.web.exception.InternalServerErrorException;
 import com.sendgrid.SendGrid;
 import com.sendgrid.SendGridException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,28 +61,7 @@ public class GitKitIdentityService {
         }
     }
 
-    private String getAuthTokenFromRequest(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
-            return null;
-        }
-
-        for (Cookie cookie : cookies) {
-            if ("gtoken".equals(cookie.getName())) {
-                return cookie.getValue();
-            }
-        }
-
-        return null;
-    }
-
-    private JsonObject getUserPayload(String authToken) {
-        try {
-            return GITKIT_CLIENT.validateTokenToJson(authToken);
-        } catch (GitkitClientException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public GitKitIdentityService() {
     }
 
     //Gitkit Widget
@@ -109,7 +90,7 @@ public class GitKitIdentityService {
     }
 
     //Email Endpoint
-    public void sendEmail(HttpServletRequest request, HttpServletResponse resp) {
+    public void sendEmail(HttpServletRequest request, HttpServletResponse response) {
         try {
             GitkitClient.OobResponse oobResponse = GITKIT_CLIENT.getOobResponse(request);
 
@@ -129,11 +110,53 @@ public class GitKitIdentityService {
                         "\n\nIf you didn't request a password change for this account, please disregard this message.";
                 sendEmail(oobResponse.getEmail(), subject, text);
             }
-
-            resp.getWriter().write(oobResponse.getResponseBody());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            response.getWriter().write(oobResponse.getResponseBody());
+        } catch (IOException | SendGridException | GitkitServerException e) {
+            throw new InternalServerErrorException();
         }
+    }
+
+    private void sendEmail(String recipientEmail, String subject, String text)
+            throws SendGridException {
+        SendGrid.Email email = new SendGrid.Email();
+        email.addTo(recipientEmail);
+        email.setFrom("aerisvulpe@gmail.com");
+        email.setSubject(subject);
+        email.setText(text);
+        sendGrid.send(email);
+    }
+
+    public String getUserLocalId(HttpServletRequest request) {
+        JsonObject gitkitUserPayload = getUserPayload(getAuthTokenFromRequest(request));
+        if (gitkitUserPayload == null) {
+            return null;
+        }
+
+        return gitkitUserPayload.get("user_id").getAsString();
+    }
+
+    private JsonObject getUserPayload(String authToken) {
+        try {
+            return GITKIT_CLIENT.validateTokenToJson(authToken);
+        } catch (GitkitClientException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private String getAuthTokenFromRequest(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return null;
+        }
+
+        for (Cookie cookie : cookies) {
+            if ("gtoken".equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+
+        return null;
     }
 
     public GitKitProfile getGitKitProfile(HttpServletRequest request, boolean updateAccount) {
@@ -177,43 +200,22 @@ public class GitKitIdentityService {
             account.addPermission(Account.PERMISSION_EMAIL_VERTIFIED);
         }
 
-        try {
-            if (newAccount) {
-                account.addRole(Account.ROLE_USER);
-                account.addPermission(Account.PERMISSION_ENABLED);
-                if (!verified) {
+        if (newAccount) {
+            account.addRole(Account.ROLE_USER);
+            account.addPermission(Account.PERMISSION_ENABLED);
+            if (!verified) {
+                try {
                     sendVerificationEmail(email, GITKIT_CLIENT.getEmailVerificationLink(email));
+                } catch (SendGridException | GitkitServerException | GitkitClientException e) {
+                    e.printStackTrace();
                 }
-                accountManager.createNewAccount(account);
-            } else {
-                accountManager.updateAccount(account);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            accountManager.createNewAccount(account);
+        } else {
+            accountManager.updateAccount(account);
         }
 
         return gitKitProfileFromAccount(account);
-    }
-
-    private void sendVerificationEmail(String recipientEmail, String emailVerificationLink)
-            throws SendGridException {
-        String subject = "Verify email address for Spring Boilerplate account";
-        String text = "Hello!\n\n The email address for your Spring Boilerplate account needs to be verified. " +
-                "Please click this confirmation link:\n\n " + emailVerificationLink +
-                "\n\nIf you didn't sign up with this email address, please disregard this message.";
-
-        sendEmail(recipientEmail, subject, text);
-    }
-
-    private void sendEmail(String recipientEmail, String subject, String text)
-            throws SendGridException {
-        SendGrid.Email email = new SendGrid.Email();
-        email.addTo(recipientEmail);
-        email.setFrom("aerisvulpe@gmail.com");
-        email.setSubject(subject);
-        email.setText(text);
-        sendGrid.send(email);
     }
 
     private GitKitProfile gitKitProfileFromAccount(Account account) {
@@ -232,5 +234,15 @@ public class GitKitIdentityService {
         profile.addRoles(new ArrayList<>(account.getRoles()));
         profile.addPermissions(new ArrayList<>(account.getPermissions()));
         return profile;
+    }
+
+    private void sendVerificationEmail(String recipientEmail, String emailVerificationLink)
+            throws SendGridException {
+        String subject = "Verify email address for Spring Boilerplate account";
+        String text = "Hello!\n\n The email address for your Spring Boilerplate account needs to be verified. " +
+                "Please click this confirmation link:\n\n " + emailVerificationLink +
+                "\n\nIf you didn't sign up with this email address, please disregard this message.";
+
+        sendEmail(recipientEmail, subject, text);
     }
 }

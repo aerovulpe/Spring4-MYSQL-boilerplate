@@ -1,4 +1,4 @@
-package com.namespace.security;
+package com.namespace.security.gitkit;
 
 import org.pac4j.core.profile.CommonProfile;
 

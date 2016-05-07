@@ -390,7 +390,8 @@ if (typeof jQuery === 'undefined') {
 
         if (this.sliding)       return this.$element.one('slid.bs.carousel', function () {
             that.to(pos)
-        });; // yes, "slid"
+        });
+         // yes, "slid"
         if (activeIndex == pos) return this.pause().cycle();
 
         return this.slide(pos > activeIndex ? 'next' : 'prev', this.$items.eq(pos))
@@ -871,8 +872,10 @@ if (typeof jQuery === 'undefined') {
 
         var index = $items.index(e.target);
 
-        if (e.which == 38 && index > 0)                 index--;;         // up
-        if (e.which == 40 && index < $items.length - 1) index++;;         // down
+        if (e.which == 38 && index > 0)                 index--;
+                 // up
+        if (e.which == 40 && index < $items.length - 1) index++;
+                 // down
         if (!~index)                                    index = 0;
 
         $items.eq(index).trigger('focus')
@@ -1125,8 +1128,8 @@ if (typeof jQuery === 'undefined') {
                     : this.hide()
             }, this));
 
-            if (doAnimate) this.$backdrop[0].offsetWidth;; // force reflow
-
+            if (doAnimate) this.$backdrop[0].offsetWidth;
+             // force reflow
             this.$backdrop.addClass('in');
 
             if (!callback) return;
@@ -1249,7 +1252,8 @@ if (typeof jQuery === 'undefined') {
         if ($this.is('a')) e.preventDefault();
 
         $target.one('show.bs.modal', function (showEvent) {
-            if (showEvent.isDefaultPrevented()) return;; // only register focus restorer if modal will actually get shown
+            if (showEvent.isDefaultPrevented()) return;
+             // only register focus restorer if modal will actually get shown
             $target.one('hidden.bs.modal', function () {
                 $this.is(':visible') && $this.trigger('focus')
             })

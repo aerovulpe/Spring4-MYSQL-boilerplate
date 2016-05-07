@@ -1,7 +1,11 @@
 package com.namespace.init;
 
 import com.namespace.model.Account;
-import com.namespace.security.*;
+import com.namespace.security.gitkit.GitkitAuthenticator;
+import com.namespace.security.gitkit.GitkitClient;
+import com.namespace.security.jwt.HeaderTokenClient;
+import com.namespace.security.jwt.TimedJwtAuthenticator;
+import com.namespace.security.jwt.TimedJwtGenerator;
 import com.namespace.service.GitKitIdentityService;
 import org.pac4j.core.authorization.authorizer.Authorizer;
 import org.pac4j.core.authorization.authorizer.RequireAllRolesAuthorizer;
