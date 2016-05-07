@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@JsonIgnoreProperties({"naturalId", "password"})
+@JsonIgnoreProperties({"id", "naturalId", "password", "roles", "permissions"})
 @Table(name = "accounts")
 public class Account {
     public static final String ROLE_USER = "ROLE_USER";
@@ -67,12 +67,90 @@ public class Account {
         gender = Gender.UNSPECIFIED;
     }
 
+    public void addRole(String role) {
+        roles.add(role);
+    }
+
+    public void removeRole(String role) {
+        roles.remove(role);
+    }
+
+    public void addPermission(String permission) {
+        permissions.add(permission);
+    }
+
+    public void removePermission(String permission) {
+        permissions.remove(permission);
+    }
+
+    public boolean hasRole(String role) {
+        return roles.contains(role);
+    }
+
+    public boolean hasPermission(String permission) {
+        return permissions.contains(permission);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getId().hashCode();
+        result = 31 * result + getNaturalId().hashCode();
+        result = 31 * result + (getPassword() != null ? getPassword().hashCode() : 0);
+        result = 31 * result + getFirstName().hashCode();
+        result = 31 * result + getLastName().hashCode();
+        result = 31 * result + getEmail().hashCode();
+        result = 31 * result + (getGender() != null ? getGender().hashCode() : 0);
+        result = 31 * result + (getLocale() != null ? getLocale().hashCode() : 0);
+        result = 31 * result + (getPictureUrl() != null ? getPictureUrl().hashCode() : 0);
+        result = 31 * result + (getLocation() != null ? getLocation().hashCode() : 0);
+        result = 31 * result + getRoles().hashCode();
+        result = 31 * result + getPermissions().hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Account account = (Account) o;
+
+        if (!getId().equals(account.getId())) return false;
+        if (!getNaturalId().equals(account.getNaturalId())) return false;
+        if (getPassword() != null ? !getPassword().equals(account.getPassword()) : account.getPassword() != null)
+            return false;
+        if (!getFirstName().equals(account.getFirstName())) return false;
+        if (!getLastName().equals(account.getLastName())) return false;
+        if (!getEmail().equals(account.getEmail())) return false;
+        if (getGender() != account.getGender()) return false;
+        if (getLocale() != null ? !getLocale().equals(account.getLocale()) : account.getLocale() != null) return false;
+        if (getPictureUrl() != null ? !getPictureUrl().equals(account.getPictureUrl()) : account.getPictureUrl() != null)
+            return false;
+        if (getLocation() != null ? !getLocation().equals(account.getLocation()) : account.getLocation() != null)
+            return false;
+        if (!getRoles().equals(account.getRoles())) return false;
+        return getPermissions().equals(account.getPermissions());
+
+    }
+
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getNaturalId() {
+        return naturalId;
+    }
+
+    public void setNaturalId(@NotNull String naturalId) {
+        this.naturalId = naturalId;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public String getFirstName() {
@@ -97,22 +175,6 @@ public class Account {
 
     public void setEmail(@NotNull String email) {
         this.email = email;
-    }
-
-    public String getNaturalId() {
-        return naturalId;
-    }
-
-    public void setNaturalId(@NotNull String naturalId) {
-        this.naturalId = naturalId;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     @Enumerated(EnumType.STRING)
@@ -164,28 +226,8 @@ public class Account {
         this.permissions = permissions;
     }
 
-    public void addRole(String role) {
-        roles.add(role);
-    }
-
-    public void removeRole(String role) {
-        roles.remove(role);
-    }
-
-    public void addPermission(String permission) {
-        permissions.add(permission);
-    }
-
-    public void removePermission(String permission) {
-        permissions.remove(permission);
-    }
-
-    public boolean hasRole(String role) {
-        return roles.contains(role);
-    }
-
-    public boolean hasPermission(String permission) {
-        return permissions.contains(permission);
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override
@@ -204,47 +246,5 @@ public class Account {
                 ", roles=" + roles +
                 ", permissions=" + permissions +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Account account = (Account) o;
-
-        if (!getId().equals(account.getId())) return false;
-        if (!getNaturalId().equals(account.getNaturalId())) return false;
-        if (getPassword() != null ? !getPassword().equals(account.getPassword()) : account.getPassword() != null)
-            return false;
-        if (!getFirstName().equals(account.getFirstName())) return false;
-        if (!getLastName().equals(account.getLastName())) return false;
-        if (!getEmail().equals(account.getEmail())) return false;
-        if (getGender() != account.getGender()) return false;
-        if (getLocale() != null ? !getLocale().equals(account.getLocale()) : account.getLocale() != null) return false;
-        if (getPictureUrl() != null ? !getPictureUrl().equals(account.getPictureUrl()) : account.getPictureUrl() != null)
-            return false;
-        if (getLocation() != null ? !getLocation().equals(account.getLocation()) : account.getLocation() != null)
-            return false;
-        if (!getRoles().equals(account.getRoles())) return false;
-        return getPermissions().equals(account.getPermissions());
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = getId().hashCode();
-        result = 31 * result + getNaturalId().hashCode();
-        result = 31 * result + (getPassword() != null ? getPassword().hashCode() : 0);
-        result = 31 * result + getFirstName().hashCode();
-        result = 31 * result + getLastName().hashCode();
-        result = 31 * result + getEmail().hashCode();
-        result = 31 * result + (getGender() != null ? getGender().hashCode() : 0);
-        result = 31 * result + (getLocale() != null ? getLocale().hashCode() : 0);
-        result = 31 * result + (getPictureUrl() != null ? getPictureUrl().hashCode() : 0);
-        result = 31 * result + (getLocation() != null ? getLocation().hashCode() : 0);
-        result = 31 * result + getRoles().hashCode();
-        result = 31 * result + getPermissions().hashCode();
-        return result;
     }
 }

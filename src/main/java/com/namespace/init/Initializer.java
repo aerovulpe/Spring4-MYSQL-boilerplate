@@ -8,6 +8,7 @@ import org.springframework.web.servlet.support.AbstractDispatcherServletInitiali
 import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
 import java.util.EnumSet;
 
 /**
@@ -24,11 +25,6 @@ public class Initializer extends AbstractDispatcherServletInitializer {
     }
 
     @Override
-    protected WebApplicationContext createRootApplicationContext() {
-        return null;
-    }
-
-    @Override
     protected WebApplicationContext createServletApplicationContext() {
         AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
         ctx.register(WebAppConfig.class);
@@ -40,4 +36,13 @@ public class Initializer extends AbstractDispatcherServletInitializer {
         return new String[]{"/*"};
     }
 
+    @Override
+    protected WebApplicationContext createRootApplicationContext() {
+        return null;
+    }
+
+    @Override
+    protected void customizeRegistration(ServletRegistration.Dynamic reg) {
+        reg.setInitParameter("throwExceptionIfNoHandlerFound", "true");
+    }
 }

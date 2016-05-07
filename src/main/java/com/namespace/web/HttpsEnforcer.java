@@ -7,7 +7,7 @@ import java.io.IOException;
 
 /**
  * Enforce Https for Heroku
- * */
+ */
 public class HttpsEnforcer implements Filter {
 
     private static final String X_FORWARDED_PROTO = "x-forwarded-proto";

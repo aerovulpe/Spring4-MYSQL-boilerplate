@@ -44,14 +44,7 @@ public class AccountDAOImpl extends SessionDAO<Account, Long> implements Account
 
     @Override
     public Account getAccount(String naturalId) {
-        try {
-            logger.info("retrieving this account from the database: " + naturalId);
-
-            return getCurrentSession().bySimpleNaturalId(Account.class).load(naturalId);
-        } catch (Exception e) {
-            logger.info("cannot retrieve " + naturalId + "'s account from the database.");
-            return null;
-        }
+        return getCurrentSession().bySimpleNaturalId(Account.class).load(naturalId);
     }
 
 
@@ -61,7 +54,7 @@ public class AccountDAOImpl extends SessionDAO<Account, Long> implements Account
     }
 
     @Override
-    public Account retrieve(Long id) throws Exception {
+    public Account retrieve(Long id) {
         return getCurrentSession().get(Account.class, id);
     }
 

@@ -11,7 +11,7 @@ public interface AccountManager {
 
     Account getAccountByNaturalId(String naturalId);
 
-    Long createNewAccount(Account account) throws Exception;
+    Long createNewAccount(Account account);
 
     List<Account> getEnabledAccounts();
 

@@ -1,7 +1,7 @@
 package com.namespace.controller;
 
 import com.namespace.model.Account;
-import com.namespace.security.GitKitProfile;
+import com.namespace.security.gitkit.GitKitProfile;
 import com.namespace.service.GitKitIdentityService;
 import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.context.WebContext;
@@ -68,13 +68,12 @@ public abstract class BaseController {
         return account;
     }
 
-    protected String getUserNaturalId(CommonProfile profile) {
+    private String getUserNaturalId(CommonProfile profile) {
         return profile.getId();
     }
 
-    protected String getUserNaturalId(HttpServletRequest request, HttpServletResponse response) {
-        CommonProfile profile = getProfile(request, response);
-        return profile == null ? null : getUserNaturalId(profile);
+    protected String getUserNaturalId(HttpServletRequest request) {
+        return gitKitIdentityService.getUserLocalId(request);
     }
 
     void serveHtmlPage(String path, HttpServletResponse response) {

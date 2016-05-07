@@ -1,4 +1,4 @@
-package com.namespace.security;
+package com.namespace.security.gitkit;
 
 import com.namespace.service.GitKitIdentityService;
 import org.pac4j.core.credentials.TokenCredentials;

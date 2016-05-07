@@ -1,4 +1,4 @@
-package com.namespace.security;
+package com.namespace.security.jwt;
 
 import com.nimbusds.jose.JWEObject;
 import com.nimbusds.jose.crypto.DirectDecrypter;
@@ -36,32 +36,6 @@ public class TimedJwtAuthenticator extends JwtAuthenticator {
 
     public TimedJwtAuthenticator(String signingSecret, String encryptionSecret) {
         super(signingSecret, encryptionSecret);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static void createJwtProfile(final TokenCredentials credentials, final SignedJWT signedJWT) throws ParseException {
-        final JWTClaimsSet claimSet = signedJWT.getJWTClaimsSet();
-        String subject = claimSet.getSubject();
-
-        if (!subject.contains(UserProfile.SEPARATOR)) {
-            subject = JwtProfile.class.getSimpleName() + UserProfile.SEPARATOR + subject;
-        }
-
-        final Map<String, Object> attributes = new HashMap<>(claimSet.getClaims());
-        attributes.remove(JwtConstants.SUBJECT);
-        final List<String> roles = (List<String>) attributes.get(JwtGenerator.INTERNAL_ROLES);
-        attributes.remove(JwtGenerator.INTERNAL_ROLES);
-        final List<String> permissions = (List<String>) attributes.get(JwtGenerator.INTERNAL_PERMISSIONS);
-        attributes.remove(JwtGenerator.INTERNAL_PERMISSIONS);
-        final CommonProfile profile = ProfileHelper.buildProfile(subject, attributes);
-
-        if (roles != null) {
-            profile.addRoles(roles);
-        }
-        if (permissions != null) {
-            profile.addPermissions(permissions);
-        }
-        credentials.setUserProfile(profile);
     }
 
     /**
@@ -110,5 +84,31 @@ public class TimedJwtAuthenticator extends JwtAuthenticator {
         } catch (final Exception e) {
             throw new TechnicalException("Cannot get claimSet", e);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void createJwtProfile(final TokenCredentials credentials, final SignedJWT signedJWT) throws ParseException {
+        final JWTClaimsSet claimSet = signedJWT.getJWTClaimsSet();
+        String subject = claimSet.getSubject();
+
+        if (!subject.contains(UserProfile.SEPARATOR)) {
+            subject = JwtProfile.class.getSimpleName() + UserProfile.SEPARATOR + subject;
+        }
+
+        final Map<String, Object> attributes = new HashMap<>(claimSet.getClaims());
+        attributes.remove(JwtConstants.SUBJECT);
+        final List<String> roles = (List<String>) attributes.get(JwtGenerator.INTERNAL_ROLES);
+        attributes.remove(JwtGenerator.INTERNAL_ROLES);
+        final List<String> permissions = (List<String>) attributes.get(JwtGenerator.INTERNAL_PERMISSIONS);
+        attributes.remove(JwtGenerator.INTERNAL_PERMISSIONS);
+        final CommonProfile profile = ProfileHelper.buildProfile(subject, attributes);
+
+        if (roles != null) {
+            profile.addRoles(roles);
+        }
+        if (permissions != null) {
+            profile.addPermissions(permissions);
+        }
+        credentials.setUserProfile(profile);
     }
 }

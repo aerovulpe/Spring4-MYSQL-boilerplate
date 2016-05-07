@@ -32,30 +32,30 @@ import java.util.Optional;
 
 public class RequiresAuthenticationInterceptor extends HandlerInterceptorAdapter {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected ClientFinder clientFinder = new DefaultClientFinder();
+    private ClientFinder clientFinder = new DefaultClientFinder();
 
-    protected AuthorizationChecker authorizationChecker = new DefaultAuthorizationChecker();
+    private AuthorizationChecker authorizationChecker = new DefaultAuthorizationChecker();
 
-    protected Config config;
+    private Config config;
 
-    protected String clientName;
+    private String clientName;
 
-    protected String authorizerName;
-
-    public RequiresAuthenticationInterceptor(final Config config) {
-        this.config = config;
-    }
-
-    public RequiresAuthenticationInterceptor(final Config config, final String clientName) {
-        this(config);
-        this.clientName = clientName;
-    }
+    private String authorizerName;
 
     public RequiresAuthenticationInterceptor(final Config config, final String clientName, final String authorizerName) {
         this(config, clientName);
         this.authorizerName = authorizerName;
+    }
+
+    private RequiresAuthenticationInterceptor(final Config config, final String clientName) {
+        this(config);
+        this.clientName = clientName;
+    }
+
+    private RequiresAuthenticationInterceptor(final Config config) {
+        this.config = config;
     }
 
     @Override
@@ -130,25 +130,25 @@ public class RequiresAuthenticationInterceptor extends HandlerInterceptorAdapter
         return false;
     }
 
-    protected boolean useSession(final WebContext context, final List<Client> currentClients) {
+    private boolean useSession(final WebContext context, final List<Client> currentClients) {
         return currentClients == null || currentClients.size() == 0 || currentClients.get(0) instanceof IndirectClient;
     }
 
-    protected void forbidden(final WebContext context, final List<Client> currentClients, final UserProfile profile) {
+    private void forbidden(final WebContext context, final List<Client> currentClients, final UserProfile profile) {
         context.setResponseStatus(HttpConstants.FORBIDDEN);
     }
 
-    protected boolean startAuthentication(final WebContext context, final List<Client> currentClients) {
+    private boolean startAuthentication(final WebContext context, final List<Client> currentClients) {
         return currentClients != null && currentClients.size() > 0 && currentClients.get(0) instanceof IndirectClient;
     }
 
-    protected void saveRequestedUrl(final WebContext context, final List<Client> currentClients) {
+    private void saveRequestedUrl(final WebContext context, final List<Client> currentClients) {
         final String requestedUrl = context.getFullRequestURL();
         logger.debug("requestedUrl: {}", requestedUrl);
         context.setSessionAttribute(Pac4jConstants.REQUESTED_URL, requestedUrl);
     }
 
-    protected void redirectToIdentityProvider(final WebContext context, final List<Client> currentClients) {
+    private void redirectToIdentityProvider(final WebContext context, final List<Client> currentClients) {
         try {
             final IndirectClient currentClient = (IndirectClient) currentClients.get(0);
             currentClient.redirect(context);
@@ -157,7 +157,7 @@ public class RequiresAuthenticationInterceptor extends HandlerInterceptorAdapter
         }
     }
 
-    protected void unauthorized(final WebContext context, final List<Client> currentClients) {
+    private void unauthorized(final WebContext context, final List<Client> currentClients) {
         context.setResponseStatus(HttpConstants.UNAUTHORIZED);
     }
 
