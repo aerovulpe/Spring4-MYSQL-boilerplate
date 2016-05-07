@@ -133,6 +133,24 @@ public class Account {
 
     }
 
+    @Override
+    public String toString() {
+        return "Account{" +
+                "id=" + id +
+                ", naturalId='" + naturalId + '\'' +
+                ", password='" + password + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", gender=" + gender +
+                ", locale='" + locale + '\'' +
+                ", pictureUrl='" + pictureUrl + '\'' +
+                ", location='" + location + '\'' +
+                ", roles=" + roles +
+                ", permissions=" + permissions +
+                '}';
+    }
+
     public Long getId() {
         return id;
     }
@@ -228,23 +246,5 @@ public class Account {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    @Override
-    public String toString() {
-        return "Account{" +
-                "id=" + id +
-                ", naturalId='" + naturalId + '\'' +
-                ", password='" + password + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", gender=" + gender +
-                ", locale='" + locale + '\'' +
-                ", pictureUrl='" + pictureUrl + '\'' +
-                ", location='" + location + '\'' +
-                ", roles=" + roles +
-                ", permissions=" + permissions +
-                '}';
     }
 }

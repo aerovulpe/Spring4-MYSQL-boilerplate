@@ -28,7 +28,7 @@ public class AccountController extends BaseController {
     @RequestMapping(value = "/me", method = GET)
     public Account getAccount(HttpServletRequest request, HttpServletResponse response) {
         CommonProfile profile = getProfile(request, response);
-        if(profile == null){
+        if (profile == null) {
             throw new UnAuthorizedException();
         }
         return accountFromProfile(profile);

@@ -37,12 +37,12 @@ public class Initializer extends AbstractDispatcherServletInitializer {
     }
 
     @Override
-    protected WebApplicationContext createRootApplicationContext() {
-        return null;
+    protected void customizeRegistration(ServletRegistration.Dynamic reg) {
+        reg.setInitParameter("throwExceptionIfNoHandlerFound", "true");
     }
 
     @Override
-    protected void customizeRegistration(ServletRegistration.Dynamic reg) {
-        reg.setInitParameter("throwExceptionIfNoHandlerFound", "true");
+    protected WebApplicationContext createRootApplicationContext() {
+        return null;
     }
 }

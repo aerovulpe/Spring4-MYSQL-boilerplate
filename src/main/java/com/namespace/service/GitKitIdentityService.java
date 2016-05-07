@@ -45,6 +45,9 @@ public class GitKitIdentityService {
     public GitKitIdentityService() {
     }
 
+    public GitKitIdentityService() {
+    }
+
     @PostConstruct
     public void postConstruct() {
         try {
@@ -59,9 +62,6 @@ public class GitKitIdentityService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public GitKitIdentityService() {
     }
 
     //Gitkit Widget
