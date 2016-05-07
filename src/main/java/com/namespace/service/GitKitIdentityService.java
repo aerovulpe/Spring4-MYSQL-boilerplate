@@ -45,9 +45,6 @@ public class GitKitIdentityService {
     public GitKitIdentityService() {
     }
 
-    public GitKitIdentityService() {
-    }
-
     @PostConstruct
     public void postConstruct() {
         try {
