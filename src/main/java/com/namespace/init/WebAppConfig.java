@@ -121,6 +121,7 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
         return new SendGrid(environment.getProperty(PROPERTY_NAME_SENDGRID_API_KEY));
     }
 
+    @Bean
     public HibernateTransactionManager transactionManager() {
         HibernateTransactionManager transactionManager = new HibernateTransactionManager();
         transactionManager.setSessionFactory(sessionFactory().getObject());
