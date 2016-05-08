@@ -2,20 +2,14 @@ package com.namespace.init;
 
 
 import com.namespace.web.RequiresAuthenticationInterceptor;
-import com.namespace.web.exception.BadRequestException;
-import com.namespace.web.exception.ForbiddenException;
-import com.namespace.web.exception.InternalServerErrorException;
-import com.namespace.web.exception.UnAuthorizedException;
+import com.namespace.web.exception.*;
 import com.sendgrid.SendGrid;
 import cz.jirutka.spring.exhandler.RestHandlerExceptionResolver;
-import cz.jirutka.spring.exhandler.handlers.ErrorMessageRestExceptionHandler;
-import cz.jirutka.spring.exhandler.support.HttpMessageConverterUtils;
 import org.pac4j.core.config.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -31,7 +25,6 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
-import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
@@ -89,26 +82,15 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
-        ExceptionHandlerExceptionResolver resolver = new ExceptionHandlerExceptionResolver();
-        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-
-        messageSource.setBasename("classpath:messages");
-        messageSource.setDefaultEncoding("UTF-8");
-
-        resolver.setMessageConverters(HttpMessageConverterUtils.getDefaultHttpMessageConverters());
-        resolvers.add(resolver); // resolves @ExceptionHandler
         resolvers.add(RestHandlerExceptionResolver.builder()
                 .defaultContentType(MediaType.APPLICATION_JSON)
-                .messageSource(messageSource)
+                .messageSource(messageSource())
                 .addErrorMessageHandler(EmptyResultDataAccessException.class, HttpStatus.NOT_FOUND)
-                .addHandler(BadRequestException.class,
-                        new ErrorMessageRestExceptionHandler<>(BadRequestException.class, HttpStatus.BAD_REQUEST))
-                .addHandler(ForbiddenException.class,
-                        new ErrorMessageRestExceptionHandler<>(ForbiddenException.class, HttpStatus.FORBIDDEN))
-                .addHandler(InternalServerErrorException.class,
-                        new ErrorMessageRestExceptionHandler<>(InternalServerErrorException.class, HttpStatus.INTERNAL_SERVER_ERROR))
-                .addHandler(UnAuthorizedException.class,
-                        new ErrorMessageRestExceptionHandler<>(UnAuthorizedException.class, HttpStatus.UNAUTHORIZED))
+                .addErrorMessageHandler(BadRequestException.class, HttpStatus.BAD_REQUEST)
+                .addErrorMessageHandler(ForbiddenException.class, HttpStatus.FORBIDDEN)
+                .addErrorMessageHandler(InternalServerErrorException.class, HttpStatus.INTERNAL_SERVER_ERROR)
+                .addErrorMessageHandler(NotFoundException.class, HttpStatus.NOT_FOUND)
+                .addErrorMessageHandler(UnAuthorizedException.class, HttpStatus.UNAUTHORIZED)
                 .build());
     }
 

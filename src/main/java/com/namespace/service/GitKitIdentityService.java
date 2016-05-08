@@ -7,6 +7,7 @@ import com.google.identitytoolkit.GitkitServerException;
 import com.namespace.model.Account;
 import com.namespace.security.gitkit.GitKitProfile;
 import com.namespace.web.exception.InternalServerErrorException;
+import com.namespace.web.exception.NotFoundException;
 import com.sendgrid.SendGrid;
 import com.sendgrid.SendGridException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,10 +68,10 @@ public class GitKitIdentityService {
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            throw new NotFoundException();
         } catch (IOException e) {
             e.printStackTrace();
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            throw new InternalServerErrorException();
         }
     }
 
