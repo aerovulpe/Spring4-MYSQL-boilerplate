@@ -182,10 +182,13 @@ public class GitKitIdentityService {
         }
         if (gitkitUserPayload.has("display_name")) {
             String[] names = gitkitUserPayload.get("display_name").getAsString().split(" ");
-            String lastName = names.length > 1 ? names[names.length - 1] : "";
             account.setFirstName(names[0]);
-            account.setLastName(lastName);
-        } else {
+            if (names.length > 1) {
+                account.setLastName(names[names.length - 1]);
+            } else if (newAccount) {
+                account.setLastName("");
+            }
+        } else if (newAccount) {
             account.setFirstName("");
             account.setLastName("");
         }
