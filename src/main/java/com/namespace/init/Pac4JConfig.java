@@ -32,7 +32,7 @@ public class Pac4JConfig {
     private GitKitIdentityService gitKitIdentityService;
 
     @Bean
-    TimedJwtGenerator<CommonProfile> timedJwtGenerator() {
+    private TimedJwtGenerator<CommonProfile> timedJwtGenerator() {
         return new TimedJwtGenerator<>(environment.getProperty(PROPERTY_NAME_JWT_SIGNING_SECRET),
                 environment.getProperty(PROPERTY_NAME_JWT_ENCRYPTION_SECRET));
     }

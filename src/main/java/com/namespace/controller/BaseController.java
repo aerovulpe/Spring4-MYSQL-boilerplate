@@ -76,7 +76,7 @@ public abstract class BaseController {
         return gitKitIdentityService.getUserLocalId(request);
     }
 
-    void serveHtmlPage(String path, HttpServletResponse response) {
+    protected void serveHtmlPage(String path, HttpServletResponse response) {
         response.setContentType("text/html");
         try {
             response.getWriter().print(new Scanner(new File(servletContext
