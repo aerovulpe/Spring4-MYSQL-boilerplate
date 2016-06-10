@@ -186,7 +186,7 @@ public class GitKitIdentityService {
         }
         account.setEmail(email);
         if (verified) {
-            account.addPermission(Account.PERMISSION_EMAIL_VERTIFIED);
+            account.addPermission(Account.PERMISSION_EMAIL_VERIFIED);
         }
 
         if (newAccount) {
@@ -216,10 +216,7 @@ public class GitKitIdentityService {
         profile.addAttribute("family_name", account.getLastName());
         profile.addAttribute("name", account.getFirstName() + " " + account.getLastName());
         profile.addAttribute("display_name", account.getFirstName());
-        profile.addAttribute("gender", account.getGender());
-        profile.addAttribute("locale", account.getLocale());
         profile.addAttribute("picture_url", account.getPictureUrl());
-        profile.addAttribute("location", account.getLocation());
         profile.addRoles(new ArrayList<>(account.getRoles()));
         profile.addPermissions(new ArrayList<>(account.getPermissions()));
         return profile;

@@ -6,7 +6,6 @@ import com.namespace.service.GitKitIdentityService;
 import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.profile.CommonProfile;
-import org.pac4j.core.profile.Gender;
 import org.pac4j.core.profile.ProfileManager;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,10 +58,6 @@ public abstract class BaseController {
         account.setLastName(profile.getFamilyName());
         account.setEmail(profile.getEmail());
         account.setPictureUrl(profile.getPictureUrl());
-        account.setGender(profile.getAttribute("gender") instanceof Gender ? profile.getGender() :
-                Gender.valueOf(profile.getAttribute("gender", String.class)));
-        account.setLocale(profile.getLocale() == null ? null : profile.getLocale().toLanguageTag());
-        account.setLocation(profile.getLocation());
         account.setRoles(new HashSet<>(profile.getRoles()));
         account.setPermissions(new HashSet<>(profile.getPermissions()));
         return account;
